@@ -3,6 +3,8 @@
 #include <BLEUtils.h>
 #include <BLE2902.h>
 
+#include "Device.h"
+
 #define SERVICE_UUID        "12345678-1234-5678-1234-56789abcdef0"
 #define CHARACTERISTIC_UUID "abcd1234-5678-1234-5678-abcdef123456"
 
@@ -10,6 +12,7 @@
 #define PIN_LED1 26
 #define PIN_LED2 25
 
+LED *leds;
 int frequency = 1000;
 BLEServer* pServer = nullptr;
 BLECharacteristic* pCharacteristic = nullptr;
@@ -32,24 +35,28 @@ class MyServerCallbacks : public BLEServerCallbacks {
 void processCommand(String command) {
     if (command.startsWith("ON_")) {
         int led = command.substring(3).toInt();
-        light(getLedPin(led));
+        // light(getLedPin(led));
+        leds[led].light();
         sendConfirmation("Turned ON LED " + String(led));
     } 
     else if (command.startsWith("OFF_")) {
         int led = command.substring(4).toInt();
         digitalWrite(getLedPin(led), LOW);
+
         sendConfirmation("Turned OFF LED " + String(led));
     } 
     else if (command.startsWith("BLINK_")) {
         int led = command.substring(6).toInt();
-        blink(getLedPin(led));
+        // blink(getLedPin(led));
+         leds[led].blink();
         sendConfirmation("Blinked LED " + String(led));
     } 
     else if (command.startsWith("BRIGHTNESS_")) {
         int firstUnderscore = command.indexOf('_', 11);
         int led = command.substring(11, firstUnderscore).toInt();
         int brightness = command.substring(firstUnderscore + 1).toInt();
-        changeBrightness(getLedPin(led), brightness);
+        // changeBrightness(getLedPin(led), brightness);
+        leds[led].changeBrightness( brightness);
         sendConfirmation("Set brightness of LED " + String(led) + " to " + String(brightness));
     } 
     else {
@@ -74,10 +81,18 @@ void setup() {
     Serial.begin(115200);
     Serial.println("Starting BLE Server...");
 
+
     // Initialize LEDs
-    pinMode(PIN_LED0, OUTPUT);
-    pinMode(PIN_LED1, OUTPUT);
-    pinMode(PIN_LED2, OUTPUT);
+
+    leds = (LED*)calloc(sizeof(LED),3);
+
+    // pinMode(PIN_LED0, OUTPUT);
+    // pinMode(PIN_LED1, OUTPUT);
+    // pinMode(PIN_LED2, OUTPUT);
+    pinMode(leds[0].pin, OUTPUT);
+    pinMode(leds[1].pin, OUTPUT);
+    pinMode(leds[2].pin, OUTPUT);
+
 
     // Initialize BLE
     BLEDevice::init("ESP32_BLE_Server");
