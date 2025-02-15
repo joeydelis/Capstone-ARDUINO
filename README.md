@@ -1,5 +1,9 @@
 # Capstone-ARDUINO
 ARDUINO Code or 5911 Capstone  
+
+
+
+
 Upload ServerAndLED code onto an ESP32 ARDUINO which is hooked up to LEDs  
 Then connect to the device via bluetooth.  
 Then send a message such as:  

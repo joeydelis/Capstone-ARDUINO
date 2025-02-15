@@ -3,7 +3,7 @@
 #include <BLEUtils.h>
 #include <BLE2902.h>
 
-#include "Device.h"
+#include "Device.h" // will structs for devices connected to the esp32
 
 #define SERVICE_UUID        "12345678-1234-5678-1234-56789abcdef0"
 #define CHARACTERISTIC_UUID "abcd1234-5678-1234-5678-abcdef123456"
@@ -12,8 +12,11 @@
 #define PIN_LED1 26
 #define PIN_LED2 25
 
-LED *leds;
-int frequency = 1000;
+LED *leds; // leds hold the LED structs
+
+int frequency = 1000; 
+
+
 BLEServer* pServer = nullptr;
 BLECharacteristic* pCharacteristic = nullptr;
 bool deviceConnected = false;
@@ -36,13 +39,15 @@ void processCommand(String command) {
     if (command.startsWith("ON_")) {
         int led = command.substring(3).toInt();
         // light(getLedPin(led));
-        leds[led].light();
+        leds[led].light(1);
         sendConfirmation("Turned ON LED " + String(led));
     } 
     else if (command.startsWith("OFF_")) {
         int led = command.substring(4).toInt();
-        digitalWrite(getLedPin(led), LOW);
-
+        digitalWrite(getLedPin(led), LOW); // pinMode(PIN_LED0, OUTPUT);
+    // pinMode(PIN_LED1, OUTPUT);
+    // pinMode(PIN_LED2, OUTPUT);
+      leds[led].light(0);
         sendConfirmation("Turned OFF LED " + String(led));
     } 
     else if (command.startsWith("BLINK_")) {
@@ -84,11 +89,8 @@ void setup() {
 
     // Initialize LEDs
 
-    leds = (LED*)calloc(sizeof(LED),3);
-
-    // pinMode(PIN_LED0, OUTPUT);
-    // pinMode(PIN_LED1, OUTPUT);
-    // pinMode(PIN_LED2, OUTPUT);
+    leds = (LED*)calloc(sizeof(LED),3); // assigning memory to each LED struct
+    
     pinMode(leds[0].pin, OUTPUT);
     pinMode(leds[1].pin, OUTPUT);
     pinMode(leds[2].pin, OUTPUT);
@@ -149,21 +151,4 @@ void sendConfirmation(String message) {
     }
 }
 
-// LED Control Functions
-void blink(int LED) {
-    digitalWrite(LED, HIGH);
-    delay(frequency);
-    digitalWrite(LED, LOW);
-    delay(frequency);
-}
 
-void light(int LED) {
-    digitalWrite(LED, HIGH);
-}
-
-void changeBrightness(int LED, int level) {
-    for (int dutyCycle = 0; dutyCycle <= level; dutyCycle++) {
-        analogWrite(LED, dutyCycle);
-        delay(150);
-    }
-}
