@@ -4,7 +4,7 @@
 #include <BLE2902.h>
 
 #include "Device.h" // will structs for devices connected to the esp32
-
+// #include "Timer.h"
 #define SERVICE_UUID        "12345678-1234-5678-1234-56789abcdef0"
 #define CHARACTERISTIC_UUID "abcd1234-5678-1234-5678-abcdef123456"
 
@@ -86,7 +86,7 @@ void setup() {
     Serial.begin(115200);
     Serial.println("Starting BLE Server...");
 
-
+//  std::thread thread_obj(&Timer::stopwatch, &t , 5);
     // Initialize LEDs
 
     leds = (LED*)calloc(sizeof(LED),3); // assigning memory to each LED struct
