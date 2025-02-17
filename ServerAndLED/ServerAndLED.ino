@@ -3,8 +3,9 @@
 #include <BLEUtils.h>
 #include <BLE2902.h>
 
-#include "Device.h" // will structs for devices connected to the esp32
 // #include "Timer.h"
+// #include "Device.h" // will structs for devices connected to the esp32
+#include "Governor.h" // governor will include both Timer.h and Device.h
 #define SERVICE_UUID        "12345678-1234-5678-1234-56789abcdef0"
 #define CHARACTERISTIC_UUID "abcd1234-5678-1234-5678-abcdef123456"
 
@@ -13,7 +14,7 @@
 #define PIN_LED2 25
 
 LED *leds; // leds hold the LED structs
-
+ Timer stopwatch;
 int frequency = 1000; 
 
 
@@ -85,12 +86,14 @@ class MyCallbacks : public BLECharacteristicCallbacks {
 void setup() {
     Serial.begin(115200);
     Serial.println("Starting BLE Server...");
-
+   
 //  std::thread thread_obj(&Timer::stopwatch, &t , 5);
     // Initialize LEDs
 
     leds = (LED*)calloc(sizeof(LED),3); // assigning memory to each LED struct
-    
+    leds[0].pin = PIN_LED0;
+    leds[1].pin = PIN_LED1;
+    leds[2].pin = PIN_LED2;
     pinMode(leds[0].pin, OUTPUT);
     pinMode(leds[1].pin, OUTPUT);
     pinMode(leds[2].pin, OUTPUT);
@@ -124,10 +127,20 @@ void setup() {
     pServer->getAdvertising()->start();
 
     Serial.println("BLE Server Started. Waiting for connections...");
+
+
+    
+    stopwatch.timing = 1;
+    stopwatch.stopwatch(60);
+    
 }
 
 void loop() {
     // The main logic is handled by the BLE callback; no need to put logic in loop.
+  if( *stopwatch.time ==30){
+    // signal to stop all lighting
+    Serial.println("Time Limit reached");
+  }
 }
 
 
