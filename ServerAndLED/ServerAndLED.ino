@@ -130,17 +130,17 @@ void setup() {
 
 
     
-    stopwatch.timing = 1;
-    stopwatch.stopwatch(60);
+    // stopwatch.timing = 1;
+    // stopwatch.stopwatch(60);
     
 }
 
 void loop() {
     // The main logic is handled by the BLE callback; no need to put logic in loop.
-  if( *stopwatch.time ==30){
-    // signal to stop all lighting
-    Serial.println("Time Limit reached");
-  }
+  // if( *stopwatch.time >=30){
+  //   // signal to stop all lighting
+  //   Serial.println("Time Limit reached");
+  // }
 }
 
 

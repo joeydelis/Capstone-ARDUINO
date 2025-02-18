@@ -43,7 +43,7 @@ void blink() {
 void light(int state) {
   
   if(state==1){
-    // brightness = 150;
+    brightness = 150;
     analogWrite(pin, 150);
     // digitalWrite(pin, LOW);
   }else{
@@ -61,14 +61,16 @@ void changeBrightness(int level) {
   if (brightness <level){ 
 
     for (; brightness <= level; brightness++) { // increase brightness gradually until desired level is met
+     
       analogWrite(pin, brightness);
-      wait((unsigned long)150); // wait is used instead of delay because it allows other operations to happen when this is running
+      wait((unsigned long)5); // wait is used instead of delay because it allows other operations to happen when this is running
     }
   } else if (brightness > level){
 
     for (; brightness >= level; brightness--) { // decrease brightness gradually untill desired level is met
+     
       analogWrite(pin, brightness);
-      wait((unsigned long) 150);
+      wait((unsigned long) 5);
     }
   }
 }
