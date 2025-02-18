@@ -1,9 +1,10 @@
-#include <thread>
-#define SECOND 1000
-
 /*
 * Timer will count down or up time depending on twhich function is used
 */
+#define SECOND 1000
+
+
+ 
 
 /*
   wait 
@@ -13,7 +14,6 @@ void wait(unsigned long waitTime){
   unsigned long initialTime =millis();
   while(millis()-initialTime <= waitTime) // replaces delay so other functions can run 
       {
-        
       }
 }
 

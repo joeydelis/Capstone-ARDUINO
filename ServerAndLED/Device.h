@@ -31,10 +31,18 @@ struct LED : Device{
   blink LED from on to off
 */
 void blink() {
+  
+ 
     analogWrite(pin, 100);
     wait((unsigned long)PAUSE);
     analogWrite(pin, 0);
     wait((unsigned long)PAUSE);
+    
+    analogWrite(pin, 100);
+    wait((unsigned long)PAUSE);
+    analogWrite(pin, 0);
+    wait((unsigned long)PAUSE);
+    
 }
 /*
   light 

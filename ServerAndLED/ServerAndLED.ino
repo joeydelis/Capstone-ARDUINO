@@ -45,7 +45,7 @@ void processCommand(String command) {
     } 
     else if (command.startsWith("OFF_")) {
         int led = command.substring(4).toInt();
-        digitalWrite(getLedPin(led), LOW); // pinMode(PIN_LED0, OUTPUT);
+        // digitalWrite(getLedPin(led), LOW); // pinMode(PIN_LED0, OUTPUT);
     // pinMode(PIN_LED1, OUTPUT);
     // pinMode(PIN_LED2, OUTPUT);
       leds[led].light(0);
