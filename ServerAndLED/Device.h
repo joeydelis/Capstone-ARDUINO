@@ -43,12 +43,12 @@ void blink() {
 void light(int state) {
   
   if(state==1){
-    brightness = 150;
+    // brightness = 150;
+    analogWrite(pin, 150);
     // digitalWrite(pin, LOW);
-    analogWrite(pin, brightness);
   }else{
     brightness = 0;
-    analogWrite(pin, brightness);
+    analogWrite(pin, 0);
 
   }
 }

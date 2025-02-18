@@ -14,8 +14,8 @@
 #define PIN_LED2 25
 
 LED *leds; // leds hold the LED structs
- Timer stopwatch;
-int frequency = 1000; 
+Timer stopwatch;
+int frequency = 1000;
 
 
 BLEServer* pServer = nullptr;
