@@ -1,10 +1,11 @@
+#include "esp_task_wdt.h"
 /*
   Device will hold the characteristics for each device
   This will be usefu to keep track of each pin values for safety monitor and reporting back to the app.
 */
 
 #define PAUSE  1000
-
+static esp_task_wdt_user_handle_t changeBrightness_twdt_user_hdl;
 // analogWrite is used instead of digital write to tue more control of the power given to the device
 
 
@@ -16,10 +17,10 @@
 
 struct Device{
   int busy =0;
+  int power =0; // power and brightness is the same thing but kept differently here for now
   int pin;
 };
 struct Motor : Device{
-  int Power =0; // power and brightness is the same thing but kept differently here for now
 };
 struct LED : Device{
   int brightness =0;
@@ -65,22 +66,31 @@ void light(int state) {
   changes the current led brightness to the desired level.
 */
 void changeBrightness(int level) {
- 
+
+  
   if (brightness <level){ 
 
     for (; brightness <= level; brightness++) { // increase brightness gradually until desired level is met
-     
       analogWrite(pin, brightness);
-      wait((unsigned long)5); // wait is used instead of delay because it allows other operations to happen when this is running
+      // delay by one so that watchdog does not trigger
+      delay(1); // tried adding the function the task and resetting the wdt but could not get that method to work
+
+      wait((unsigned long)149); // wait is used instead of delay because it allows other operations to happen when this is running
+      
+     
+      
     }
   } else if (brightness > level){
 
     for (; brightness >= level; brightness--) { // decrease brightness gradually untill desired level is met
      
       analogWrite(pin, brightness);
-      wait((unsigned long) 5);
+      delay(1);
+      wait((unsigned long) 149);
+       
     }
   }
+   
 }
 
 };

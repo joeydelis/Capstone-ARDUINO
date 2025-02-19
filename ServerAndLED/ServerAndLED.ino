@@ -1,7 +1,10 @@
+
+
 #include <BLEDevice.h>
 #include <BLEServer.h>
 #include <BLEUtils.h>
 #include <BLE2902.h>
+
 
 // #include "Timer.h"
 // #include "Device.h" // will structs for devices connected to the esp32
@@ -13,9 +16,13 @@
 #define PIN_LED1 26
 #define PIN_LED2 25
 
+TaskHandle_t taskHandler = NULL;
+
+
 LED *leds; // leds hold the LED structs
 Timer stopwatch;
 int frequency = 1000;
+
 
 
 BLEServer* pServer = nullptr;
@@ -62,6 +69,7 @@ void processCommand(String command) {
         int led = command.substring(11, firstUnderscore).toInt();
         int brightness = command.substring(firstUnderscore + 1).toInt();
         // changeBrightness(getLedPin(led), brightness);
+       
         leds[led].changeBrightness( brightness);
         sendConfirmation("Set brightness of LED " + String(led) + " to " + String(brightness));
     } 
@@ -83,11 +91,38 @@ class MyCallbacks : public BLECharacteristicCallbacks {
     }
 };
 
+
+void loop() {
+    // The main logic is handled by the BLE callback; no need to put logic in loop.
+  // stopwatch.stopwatch(60);
+
+}
+void timeRecorder(void * params) {
+    // The main logic is handled by the BLE callback; no need to put logic in loop.
+    while(1){
+
+  stopwatch.stopwatch(60);
+  
+    }
+
+}
+void timeWatcher(void * params){
+  while(1){
+  int currentTime;
+  xQueueReceive(queue, &currentTime,portMAX_DELAY);
+  Serial.println(currentTime);
+// Serial.println("hello");
+  }
+}
+
+
 void setup() {
     Serial.begin(115200);
     Serial.println("Starting BLE Server...");
-   
-//  std::thread thread_obj(&Timer::stopwatch, &t , 5);
+    queue = xQueueCreate(1, sizeof(int));
+
+    // esp_task_wdt_reconfigure(&twdt_config); // assigning new watchdog task configuration made in governor.h
+    // esp_task_wdt_add_user("wait",&wait_twdt_user_hdl);
     // Initialize LEDs
 
     leds = (LED*)calloc(sizeof(LED),3); // assigning memory to each LED struct
@@ -128,20 +163,30 @@ void setup() {
 
     Serial.println("BLE Server Started. Waiting for connections...");
 
-
     
+    xTaskCreatePinnedToCore(
+        timeWatcher, 
+        "timeWatcher", 
+        1000, 
+        NULL,
+        1,
+        &taskHandler,
+        1
+      );
+      xTaskCreatePinnedToCore(
+        timeRecorder, 
+        "timeRecorder", 
+        1000, 
+        NULL,
+        1,
+        &taskHandler,
+        1
+      );
     // stopwatch.timing = 1;
     // stopwatch.stopwatch(60);
-    
-}
 
-void loop() {
-    // The main logic is handled by the BLE callback; no need to put logic in loop.
-  // if( *stopwatch.time >=30){
-  //   // signal to stop all lighting
-  //   Serial.println("Time Limit reached");
-  // }
 }
+   
 
 
 
