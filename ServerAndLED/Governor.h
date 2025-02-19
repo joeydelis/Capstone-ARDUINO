@@ -1,17 +1,14 @@
 #include "sdkconfig.h"
 #include "esp_task_wdt.h"
-// #include "Timer.h"
-// #include "Device.h"
 #include <queue>
 #define WDT_TIMEOUT 60000 // 60 seconds for timeout
-
+#define POWERLIMIT 150
+#define RECOVER 0
 /*
 * The role of the Governor is to make sure that the device stays within 
 * safe operation.
 * 
 */
-
-std::queue<String> cmdQueue;
 
 
 /*
@@ -24,7 +21,11 @@ esp_task_wdt_config_t twdt_config = {
 };
  
 
-
+/*
+  Monitor 
+  Check the values of each connected device to make sure it's operating at the POWERLIMIT
+  Corrects the power if it is over the POWERLIMIT to RECOVER
+*/
 void monitor(std::vector<Device>){
 
 

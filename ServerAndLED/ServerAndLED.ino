@@ -1,5 +1,3 @@
-
-
 #include <BLEDevice.h>
 #include <BLEServer.h>
 #include <BLEUtils.h>
@@ -8,23 +6,26 @@
 
 #include "Timer.h"
 #include "Device.h"
-#include "Governor.h" // governor will include both Timer.h and Device.h
+#include "Governor.h"
 #define SERVICE_UUID        "12345678-1234-5678-1234-56789abcdef0"
 #define CHARACTERISTIC_UUID "abcd1234-5678-1234-5678-abcdef123456"
 
+// Predefined pins that are used with the test esp32 device
 #define PIN_LED0 27
 #define PIN_LED1 26
 #define PIN_LED2 25
 
-TaskHandle_t taskHandler = NULL;
+// setup for having multiple tasks
+TaskHandle_t timeTaskHandler = NULL;
+TaskHandle_t timeWatcherTaskHandler = NULL;
 using std::vector;
 
 vector<LED> leds; // leds hold the LED structs
-Timer timeoutClock;
-int frequency = 1000;
+Timer timeoutClock; // Timer that will countdown to ending the currently used devices
 
 
 
+//BLE setup
 BLEServer* pServer = nullptr;
 BLECharacteristic* pCharacteristic = nullptr;
 bool deviceConnected = false;
@@ -42,6 +43,8 @@ class MyServerCallbacks : public BLEServerCallbacks {
         BLEDevice::startAdvertising();
     }
 };
+//
+
 // Function to process commands received via BLE
 void processCommand(String command) {
     if (command.startsWith("ON_")) {
@@ -129,12 +132,12 @@ void setup() {
     // Initialize LEDs
 
     // leds = {};//(LED*)calloc(sizeof(LED),3); // assigning memory to each LED struct
-    leds[0].pin = PIN_LED0;
-    leds[1].pin = PIN_LED1;
-    leds[2].pin = PIN_LED2;
-    pinMode(leds[0].pin, OUTPUT);
-    pinMode(leds[1].pin, OUTPUT);
-    pinMode(leds[2].pin, OUTPUT);
+    leds.at(0).pin = PIN_LED0;
+    leds.at(1).pin = PIN_LED1;
+    leds.at(2).pin = PIN_LED2;
+    pinMode(leds.at(0).pin, OUTPUT);
+    pinMode(leds.at(1).pin, OUTPUT);
+    pinMode(leds.at(2).pin, OUTPUT);
 
 
     // Initialize BLE
@@ -166,14 +169,19 @@ void setup() {
 
     Serial.println("BLE Server Started. Waiting for connections...");
 
-    
+    /*
+      XtaskCreatePinnedToCore will create a separate task that will run along with the main program
+      and assign it to a given core.
+
+      Will need to make sure that these tasks don't interfere will the bluetooth connection
+    */
     xTaskCreatePinnedToCore(
         timeWatcher, 
         "timeWatcher", 
         1000, 
         NULL,
         0,
-        &taskHandler,
+        &timeTaskHandler,
         0
       );
       xTaskCreatePinnedToCore(
@@ -182,18 +190,11 @@ void setup() {
         1000, 
         NULL,
         0,
-        &taskHandler,
+        &timeWatcherTaskHandler,
         0
       );
-    // stopwatch.timing = 1;
-    // stopwatch.stopwatch(60);
-
-}
-   
-
-
-
-// Helper function to get LED pin from index
+ }
+ // Helper function to get LED pin from index
 int getLedPin(int ledIndex) {
     switch (ledIndex) {
         case 0: return PIN_LED0;
@@ -202,7 +203,6 @@ int getLedPin(int ledIndex) {
         default: return -1;
     }
 }
-
 // Function to send confirmation back to the phone
 void sendConfirmation(String message) {
     if (deviceConnected) {

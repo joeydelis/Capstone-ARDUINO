@@ -5,6 +5,8 @@
 */
 
 #define PAUSE  50
+#define ON 150
+#define OFF 0
 static esp_task_wdt_user_handle_t changeBrightness_twdt_user_hdl;
 // analogWrite is used instead of digital write to tue more control of the power given to the device
 
@@ -17,7 +19,7 @@ static esp_task_wdt_user_handle_t changeBrightness_twdt_user_hdl;
 
 struct Device{
   int busy =0;
-  int power =0; // power and brightness is the same thing but kept differently here for now
+  int power =0; 
   int pin;
 };
 struct Motor : Device{
@@ -26,7 +28,7 @@ struct Motor : Device{
   int rotation;
 };
 struct LED : Device{
-  int brightness =0;
+ 
 
 // LED Control Functions
 
@@ -38,9 +40,9 @@ void blink() {
   //blinks twice
   int blinkAmount = 2;
   for (int i =0; i<blinkAmount; i++){
-    analogWrite(pin, 100);
+    analogWrite(pin, ON);
     wait((unsigned long)PAUSE);
-    analogWrite(pin, 0);
+    analogWrite(pin, OFF);
     wait((unsigned long)PAUSE);
   }
 
@@ -51,12 +53,12 @@ void blink() {
 */
 void light(int state) {
   if(state==1){
-    brightness = 150;
-    analogWrite(pin, 150);
+    power = ON;
+    analogWrite(pin, ON);
     // digitalWrite(pin, LOW);
   }else{
-    brightness = 0;
-    analogWrite(pin, 0);
+    power = OFF;
+    analogWrite(pin, OFF);
   }
 }
 /*
@@ -64,18 +66,18 @@ void light(int state) {
   changes the current led brightness to the desired level.
 */
 void changeBrightness(int level) {
-  if (brightness <level){ 
-    while (brightness <= level) { // increase brightness gradually until desired level is met
-      analogWrite(pin, brightness);
+  if (power <level){ 
+    while (power <= level) { // increase brightness gradually until desired level is met
+      analogWrite(pin, power);
       wait((unsigned long)50); // wait is used instead of delay because it allows other operations to happen when this is running
-      brightness++;
+      power++;
       
     }
-  } else if (brightness > level){
-    while (brightness >= level) { // decrease brightness gradually untill desired level is met
-      analogWrite(pin, brightness);
+  } else if (power > level){
+    while (power >= level) { // decrease brightness gradually untill desired level is met
+      analogWrite(pin, power);
       wait((unsigned long) 50);
-      brightness--;
+      power--;
     }
   }
 }
