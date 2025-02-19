@@ -4,10 +4,10 @@
 #include <BLEServer.h>
 #include <BLEUtils.h>
 #include <BLE2902.h>
+#include <vector>
 
-
-// #include "Timer.h"
-// #include "Device.h" // will structs for devices connected to the esp32
+#include "Timer.h"
+#include "Device.h"
 #include "Governor.h" // governor will include both Timer.h and Device.h
 #define SERVICE_UUID        "12345678-1234-5678-1234-56789abcdef0"
 #define CHARACTERISTIC_UUID "abcd1234-5678-1234-5678-abcdef123456"
@@ -17,10 +17,10 @@
 #define PIN_LED2 25
 
 TaskHandle_t taskHandler = NULL;
+using std::vector;
 
-
-LED *leds; // leds hold the LED structs
-Timer stopwatch;
+vector<LED> leds; // leds hold the LED structs
+Timer timeoutClock;
 int frequency = 1000;
 
 
@@ -47,7 +47,7 @@ void processCommand(String command) {
     if (command.startsWith("ON_")) {
         int led = command.substring(3).toInt();
         // light(getLedPin(led));
-        leds[led].light(1);
+        leds.at(led).light(1);
         sendConfirmation("Turned ON LED " + String(led));
     } 
     else if (command.startsWith("OFF_")) {
@@ -55,13 +55,13 @@ void processCommand(String command) {
         // digitalWrite(getLedPin(led), LOW); // pinMode(PIN_LED0, OUTPUT);
     // pinMode(PIN_LED1, OUTPUT);
     // pinMode(PIN_LED2, OUTPUT);
-      leds[led].light(0);
+      leds.at(led).light(0);
         sendConfirmation("Turned OFF LED " + String(led));
     } 
     else if (command.startsWith("BLINK_")) {
         int led = command.substring(6).toInt();
         // blink(getLedPin(led));
-         leds[led].blink();
+         leds.at(led).blink();
         sendConfirmation("Blinked LED " + String(led));
     } 
     else if (command.startsWith("BRIGHTNESS_")) {
@@ -70,7 +70,7 @@ void processCommand(String command) {
         int brightness = command.substring(firstUnderscore + 1).toInt();
         // changeBrightness(getLedPin(led), brightness);
        
-        leds[led].changeBrightness( brightness);
+        leds.at(led).changeBrightness( brightness);
         sendConfirmation("Set brightness of LED " + String(led) + " to " + String(brightness));
     } 
     else {
@@ -97,19 +97,23 @@ void loop() {
   // stopwatch.stopwatch(60);
 
 }
-void timeRecorder(void * params) {
+
+/*
+  Starts timer task
+*/
+void startTimer(void * params) {
     // The main logic is handled by the BLE callback; no need to put logic in loop.
     while(1){
-
-  stopwatch.stopwatch(60);
-  
-    }
-
+      timeoutClock.stopwatch(TIMEOUTCLOCK);
+      }
 }
+/*
+  Watches the value of from the timer
+*/
 void timeWatcher(void * params){
   while(1){
   int currentTime;
-  xQueueReceive(queue, &currentTime,portMAX_DELAY);
+  xQueueReceive(timeQueue, &currentTime,portMAX_DELAY);
   Serial.println(currentTime);
 // Serial.println("hello");
   }
@@ -119,13 +123,12 @@ void timeWatcher(void * params){
 void setup() {
     Serial.begin(115200);
     Serial.println("Starting BLE Server...");
-    queue = xQueueCreate(1, sizeof(int));
-
-    // esp_task_wdt_reconfigure(&twdt_config); // assigning new watchdog task configuration made in governor.h
-    // esp_task_wdt_add_user("wait",&wait_twdt_user_hdl);
+    // Creating a queue that only holds the current time.
+    timeQueue = xQueueCreate(1, sizeof(int));
+  
     // Initialize LEDs
 
-    leds = (LED*)calloc(sizeof(LED),3); // assigning memory to each LED struct
+    // leds = {};//(LED*)calloc(sizeof(LED),3); // assigning memory to each LED struct
     leds[0].pin = PIN_LED0;
     leds[1].pin = PIN_LED1;
     leds[2].pin = PIN_LED2;
@@ -169,18 +172,18 @@ void setup() {
         "timeWatcher", 
         1000, 
         NULL,
-        1,
+        0,
         &taskHandler,
-        1
+        0
       );
       xTaskCreatePinnedToCore(
-        timeRecorder, 
-        "timeRecorder", 
+        startTimer, 
+        "startTimer", 
         1000, 
         NULL,
-        1,
+        0,
         &taskHandler,
-        1
+        0
       );
     // stopwatch.timing = 1;
     // stopwatch.stopwatch(60);

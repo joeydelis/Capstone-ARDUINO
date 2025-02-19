@@ -6,7 +6,8 @@
 * Timer will count down or up time depending on twhich function is used
 */
 #define SECOND 1000
-QueueHandle_t queue;
+#define TIMEOUTCLOCK 60*30 
+QueueHandle_t timeQueue;
 static esp_task_wdt_user_handle_t wait_twdt_user_hdl;
 
 /*
@@ -18,13 +19,12 @@ void wait(unsigned long waitTime){
   // esp_task_wdt_add(NULL);
   while(millis()-initialTime < waitTime) // replaces delay so other functions can run 
       {
-       
-       
       }
 }
 
+
 /*
-  Struct Timer 
+  Timer 
   used for having different timers if needed.
 */
 struct Timer {
@@ -38,7 +38,7 @@ struct Timer {
 */
   void stopwatch (int duration) {
     for (int i =0;i<duration;i++){
-      xQueueSend(queue, &time, portMAX_DELAY);
+      xQueueSend(timeQueue, &time, portMAX_DELAY);
       wait((unsigned long) SECOND);
       time = i;
       // Serial.println(i);

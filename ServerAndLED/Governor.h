@@ -1,7 +1,7 @@
 #include "sdkconfig.h"
 #include "esp_task_wdt.h"
-#include "Timer.h"
-#include "Device.h"
+// #include "Timer.h"
+// #include "Device.h"
 #include <queue>
 #define WDT_TIMEOUT 60000 // 60 seconds for timeout
 
@@ -12,6 +12,7 @@
 */
 
 std::queue<String> cmdQueue;
+
 
 /*
   Configuration of the custom task watchdog timer
@@ -24,7 +25,7 @@ esp_task_wdt_config_t twdt_config = {
  
 
 
-void monitor(Device device){
+void monitor(std::vector<Device>){
 
 
 };
