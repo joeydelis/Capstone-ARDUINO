@@ -1,7 +1,6 @@
 name: ESP-32 Super-Linter
 
 on: push
-    branches: [unit-testing-setup]
 
 jobs:
     super-lint:
