@@ -16,4 +16,4 @@ jobs:
             with:
                 fqbn: esp32:esp32:s3
                 sketch-paths: |
-                    - ServerAndLED
+                    - Sketch
