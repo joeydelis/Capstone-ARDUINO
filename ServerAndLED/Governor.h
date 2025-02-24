@@ -10,8 +10,15 @@
 * 
 */
 
-
-
+/*
+  Signals re used to tell the timer or device what state it should be in.
+*/
+enum Signals {
+  start, 
+  stop,
+  kill,
+  restart
+};
 
 
 
