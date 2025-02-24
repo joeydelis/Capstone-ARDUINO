@@ -11,15 +11,9 @@
 */
 
 
-/*
-  Configuration of the custom task watchdog timer
-*/
-esp_task_wdt_config_t twdt_config = {
-  .timeout_ms= WDT_TIMEOUT,
-  .idle_core_mask = (1 << CONFIG_FREERTOS_NUMBER_OF_CORES) -1, // bitmask idle core to be monitored
-  .trigger_panic = false // whether it reboots or not.
-};
- 
+
+
+
 
 /*
   Monitor 

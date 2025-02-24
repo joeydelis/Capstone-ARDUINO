@@ -20,7 +20,7 @@ TaskHandle_t timeTaskHandler = NULL;
 TaskHandle_t timeWatcherTaskHandler = NULL;
 using std::vector;
 
-vector<LED> leds; // leds hold the LED structs
+vector<LED> leds(3); // leds hold the LED structs
 Timer timeoutClock; // Timer that will countdown to ending the currently used devices
 
 
@@ -103,6 +103,7 @@ void loop() {
 
 /*
   Starts timer task
+  This starts as soon as the system starts
 */
 void startTimer(void * params) {
     // The main logic is handled by the BLE callback; no need to put logic in loop.
@@ -115,9 +116,13 @@ void startTimer(void * params) {
 */
 void timeWatcher(void * params){
   while(1){
-  int currentTime;
-  xQueueReceive(timeQueue, &currentTime,portMAX_DELAY);
+  unsigned long currentTime;
+  // Possible fix when the time watcher may crash due to not getting the correct data (happens inconsistently)
+  if(xQueueReceive(timeQueue, &currentTime,portMAX_DELAY) == pdPASS){
   Serial.println(currentTime);
+  }
+  // xQueueReceive(timeQueue, &currentTime,portMAX_DELAY);
+  
 // Serial.println("hello");
   }
 }
