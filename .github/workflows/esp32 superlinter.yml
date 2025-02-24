@@ -15,11 +15,8 @@ jobs:
             uses: arduino/compile-sketches@v1
             with:
                 fqbn: esp32:esp32:s3
-                platforms:
-                 -  name: esp32:esp32
-                    source-url: source-url: https://dl.espressif.com/dl/package_esp32_index.json
-                    libraries: |
-                        - name: BLE
-                        - name: EEPROM
-                    sketch-paths: |
-                        - ServerAndLED
+                libraries: |
+                    - name: BLE
+                    - name: EEPROM
+                sketch-paths: |
+                    - ServerAndLED
