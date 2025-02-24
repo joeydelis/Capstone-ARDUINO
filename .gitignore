@@ -1,2 +1,15 @@
+
+#files
+*.log
+*.config
+secrets.yml
+# macOS
+.DS_Store
+# Windows
+Thumbs.db
+
+# Directories
+
 # No longer tracking libraries
 libraries/
+.vscode/
