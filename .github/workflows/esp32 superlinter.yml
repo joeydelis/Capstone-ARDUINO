@@ -14,7 +14,7 @@ jobs:
           - name: Arduino IDE
             uses: arduino/compile-sketches@v1
             with:
-                fqbn: esp32:esp32:s3
+                fqbn: esp32:esp32:nano_nora
                 sketch-paths: |
                     - ServerAndLED
                 
