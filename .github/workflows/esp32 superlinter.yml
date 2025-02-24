@@ -15,5 +15,4 @@ jobs:
             uses: arduino/compile-sketches@v1
             with:
                 fqbn: esp32:esp32:s3
-                sketch-paths: |
-                    - Sketch
+              
