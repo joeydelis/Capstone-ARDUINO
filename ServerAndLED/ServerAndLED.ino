@@ -14,15 +14,16 @@
 #define PIN_LED0 27
 #define PIN_LED1 26
 #define PIN_LED2 25
-
 // setup for having multiple tasks
 TaskHandle_t timeTaskHandler = NULL;
 TaskHandle_t timeWatcherTaskHandler = NULL;
+BaseType_t xTaskWokenByReceive = pdFALSE; // default is token is has not been successfully recieved from xQueueRecieveFromISR
+BaseType_t xTaskWokenByReceive2 = pdFALSE;
 using std::vector;
 
 vector<LED> leds(3); // leds hold the LED structs
 Timer timeoutClock; // Timer that will countdown to ending the currently used devices
-
+BaseType_t  xHigherPriorityTaskWoken = pdFALSE;
 
 
 //BLE setup
@@ -75,6 +76,15 @@ void processCommand(String command) {
        
         leds.at(led).changeBrightness( brightness);
         sendConfirmation("Set brightness of LED " + String(led) + " to " + String(brightness));
+    }  else if (command.startsWith("time")) {
+        // int led = command.substring(6).toInt();
+        // blink(getLedPin(led));
+
+        unsigned long currentTime;
+        xQueueReceiveFromISR(timeRequestQueue, &currentTime,&xTaskWokenByReceive2);
+
+        Serial.print(currentTime);
+        sendConfirmation("Time: " + String(currentTime));
     } 
     else {
         sendConfirmation("Invalid command received");
@@ -117,13 +127,12 @@ void startTimer(void * params) {
 void timeWatcher(void * params){
   while(1){
   unsigned long currentTime;
-  // Possible fix when the time watcher may crash due to not getting the correct data (happens inconsistently)
-  if(xQueueReceive(timeQueue, &currentTime,portMAX_DELAY) == pdPASS){
-  Serial.println(currentTime);
-  }
-  // xQueueReceive(timeQueue, &currentTime,portMAX_DELAY);
+ 
   
-// Serial.println("hello");
+  xQueueReceiveFromISR(timeQueue, &currentTime,&xTaskWokenByReceive); // receives time while the stopwatch function is counting.
+  xQueueSendFromISR(timeRequestQueue, &currentTime, &xHigherPriorityTaskWoken ); // Sends time to any time requesting functions
+ 
+
   }
 }
 
@@ -133,7 +142,7 @@ void setup() {
     Serial.println("Starting BLE Server...");
     // Creating a queue that only holds the current time.
     timeQueue = xQueueCreate(1, sizeof(int));
-  
+    timeRequestQueue = xQueueCreate(1, sizeof(int));
     // Initialize LEDs
 
     // leds = {};//(LED*)calloc(sizeof(LED),3); // assigning memory to each LED struct

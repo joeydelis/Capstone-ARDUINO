@@ -16,7 +16,6 @@
 enum Signals {
   start, 
   stop,
-  kill,
   restart
 };
 

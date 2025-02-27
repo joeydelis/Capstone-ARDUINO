@@ -1,3 +1,5 @@
+#include "freertos/projdefs.h"
+#include "portmacro.h"
 #include "esp_task_wdt.h"
 #include "esp_err.h"
 
@@ -8,7 +10,8 @@
 #define SECOND 1000
 #define TIMEOUTCLOCK 60*30 
 // Time
-QueueHandle_t timeQueue;
+QueueHandle_t timeQueue; // for the two tasks
+QueueHandle_t timeRequestQueue; // for time watcher and BLE
 static esp_task_wdt_user_handle_t wait_twdt_user_hdl;
 
 enum TimerState {
@@ -19,7 +22,7 @@ enum TimerState {
 
 /*
   wait 
-  takes the desired time in milliseconds to wait and lopp until the time was been met or greater.
+  takes the desired time in milliseconds to wait and loop until the time was been met or greater.
 */
 void wait(unsigned long waitTime){
   unsigned long initialTime =millis();
@@ -44,13 +47,15 @@ void wait(unsigned long waitTime){
 struct Timer {
   int timing = 0; // will be used to check if the timer stopwatch function is used.
   unsigned long time=0; // points to the 
+  BaseType_t  xHigherPriorityTaskWoken = pdFALSE;
 /*
   stopwatch
   counts to a time (duration) in seconds
 */
   void stopwatch (int duration) {
     for (unsigned long i =0;i<=duration;i++){
-      xQueueSend(timeQueue, &time, portMAX_DELAY); // sends the time to the task queue so that another task can report the time.
+      xQueueSendFromISR(timeQueue, &time, &xHigherPriorityTaskWoken );
+      // xQueueSend(timeQueue, &time, portMAX_DELAY); // sends the time to the task queue so that another task can report the time.
       wait((unsigned long) SECOND);
       time = i;
     }
