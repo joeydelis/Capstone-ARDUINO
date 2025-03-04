@@ -38,6 +38,7 @@ void wait(unsigned long waitTime){
     currentTime = millis()-initialTime;
     
     }
+    
   }
 }
 /*
@@ -46,7 +47,7 @@ void wait(unsigned long waitTime){
 */
 struct Timer {
   int timing = 0; // will be used to check if the timer stopwatch function is used.
-  unsigned long time=0; // points to the 
+  unsigned long time=0; 
   BaseType_t  xHigherPriorityTaskWoken = pdFALSE;
 /*
   stopwatch

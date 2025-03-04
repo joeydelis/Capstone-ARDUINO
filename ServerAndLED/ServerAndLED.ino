@@ -140,6 +140,7 @@ void timeWatcher(void * params){
 void setup() {
     Serial.begin(115200);
     Serial.println("Starting BLE Server...");
+    esp_task_wdt_deinit();
     // Creating a queue that only holds the current time.
     timeQueue = xQueueCreate(1, sizeof(int));
     timeRequestQueue = xQueueCreate(1, sizeof(int));
@@ -207,6 +208,7 @@ void setup() {
         &timeWatcherTaskHandler,
         0
       );
+
  }
  // Helper function to get LED pin from index
 int getLedPin(int ledIndex) {
