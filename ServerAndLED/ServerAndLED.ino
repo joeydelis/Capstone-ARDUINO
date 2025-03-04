@@ -76,16 +76,23 @@ void processCommand(String command) {
        
         leds.at(led).changeBrightness( brightness);
         sendConfirmation("Set brightness of LED " + String(led) + " to " + String(brightness));
-    }  else if (command.startsWith("time")) {
-        // int led = command.substring(6).toInt();
-        // blink(getLedPin(led));
-
-        unsigned long currentTime;
-        xQueueReceiveFromISR(timeRequestQueue, &currentTime,&xTaskWokenByReceive2);
-
-        Serial.print(currentTime);
-        sendConfirmation("Time: " + String(currentTime));
-    } 
+    }  else if (command.startsWith("TIMER_")) {
+    int duration = command.substring(6).toInt();
+    if (duration > 0) {
+        xQueueSend(durationQueue, &duration, portMAX_DELAY); // Send duration to timer task
+        sendConfirmation("Started timer for " + String(duration) + " seconds");
+    } else {
+        sendConfirmation("Invalid timer duration");
+    }
+    }
+    else if (command.startsWith("TIMERTEST")) {
+    unsigned long currentTime = 0;
+    if (xQueueReceive(timeRequestQueue, &currentTime, 0) == pdPASS) {
+        sendConfirmation("Timer Status: " + String(currentTime) + " seconds elapsed");
+    } else {
+        sendConfirmation("Timer not running or no data available.");
+    }
+}
     else {
         sendConfirmation("Invalid command received");
     }
@@ -115,11 +122,13 @@ void loop() {
   Starts timer task
   This starts as soon as the system starts
 */
-void startTimer(void * params) {
-    // The main logic is handled by the BLE callback; no need to put logic in loop.
-    while(1){
-      timeoutClock.stopwatch(TIMEOUTCLOCK);
-      }
+void startTimer(void *params) {
+    unsigned long receivedDuration = timerDuration; // Default value
+    while (1) {
+        if (xQueueReceive(durationQueue, &receivedDuration, portMAX_DELAY) == pdPASS) {
+            timeoutClock.stopwatch(receivedDuration); // Run timer for received duration
+        }
+    }
 }
 /*
   Watches the value of from the timer
@@ -182,7 +191,7 @@ void setup() {
     pServer->getAdvertising()->start();
 
     Serial.println("BLE Server Started. Waiting for connections...");
-
+    durationQueue = xQueueCreate(1, sizeof(unsigned long)); // Queue for timer duration
     /*
       XtaskCreatePinnedToCore will create a separate task that will run along with the main program
       and assign it to a given core.
