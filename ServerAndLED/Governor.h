@@ -11,14 +11,20 @@
 */
 
 /*
-  Signals re used to tell the timer or device what state it should be in.
+  Signals are used to tell the timer or device what state it should be in.
 */
 enum Signals {
   start, 
   stop,
   restart
 };
-
+/*
+  States are used to tell whether the device is ready to be used or not.
+*/
+enum State{
+  ready,
+  busy,
+};
 
 
 /*

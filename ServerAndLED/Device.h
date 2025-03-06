@@ -1,4 +1,5 @@
 #include "esp_task_wdt.h"
+#include  <Stepper.h>
 /*
   Device will hold the characteristics for each device
   This will be usefu to keep track of each pin values for safety monitor and reporting back to the app.
@@ -18,7 +19,7 @@ static esp_task_wdt_user_handle_t changeBrightness_twdt_user_hdl;
 */
 
 struct Device{
-  int busy =0;
+  State state = ready;
   int power =0; 
   int pin;
 };
@@ -26,6 +27,10 @@ struct Motor : Device{
   int positionX;
   int positionY;
   int rotation;
+
+  int pin2;
+  int pin3;
+  int pin4;
 };
 struct LED : Device{
  
