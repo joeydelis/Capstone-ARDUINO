@@ -30,21 +30,21 @@ BaseType_t  xHigherPriorityTaskWoken = pdFALSE;
 BLEServer* pServer = nullptr;
 BLECharacteristic* pCharacteristic = nullptr;
 bool deviceConnected = false;
-
+void shutdownTimerTask(void *param);
 // Callback to handle BLE client connections
 class MyServerCallbacks : public BLEServerCallbacks {
     void onConnect(BLEServer* pServer) {
         deviceConnected = true;
         Serial.println("Device connected!");
-    }
-
-    void onDisconnect(BLEServer* pServer) {
-        deviceConnected = false;
-        Serial.println("Device disconnected! Restarting advertisement...");
-        BLEDevice::startAdvertising();
-    }
+}
+void onDisconnect(BLEServer* pServer) {
+    deviceConnected = false;
+    Serial.println("Device disconnected! Starting shutdown timer...");
+    BLEDevice::startAdvertising();
+    int shutdownTimeout = 30; // Time in seconds before shutdown
+    xTaskCreate(shutdownTimerTask, "ShutdownTimer", 1000, &shutdownTimeout, 1, NULL);
+}
 };
-//
 
 // Function to process commands received via BLE
 void processCommand(String command) {
@@ -96,6 +96,17 @@ void processCommand(String command) {
     else {
         sendConfirmation("Invalid command received");
     }
+}
+void shutdownTimerTask(void *param) {
+    int shutdownTime = *(int *)param;
+    vTaskDelay(pdMS_TO_TICKS(shutdownTime * 1000)); // Wait for the timeout
+
+    if (!deviceConnected) {
+        Serial.println("Device disconnected too long. Shutting down...");
+        esp_deep_sleep_start(); // Put ESP32 into deep sleep mode
+    }
+    
+    vTaskDelete(NULL); // End the task
 }
 // Callback to process received BLE messages
 class MyCallbacks : public BLECharacteristicCallbacks {
