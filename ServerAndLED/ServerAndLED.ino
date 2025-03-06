@@ -3,6 +3,7 @@
 #include <BLEUtils.h>
 #include <BLE2902.h>
 #include <vector>
+#include <Preferences.h>
 
 #include "Timer.h"
 #include "Device.h"
@@ -24,7 +25,7 @@ using std::vector;
 vector<LED> leds(3); // leds hold the LED structs
 Timer timeoutClock; // Timer that will countdown to ending the currently used devices
 BaseType_t  xHigherPriorityTaskWoken = pdFALSE;
-
+Preferences preferences;
 
 //BLE setup
 BLEServer* pServer = nullptr;
@@ -93,10 +94,162 @@ void processCommand(String command) {
         sendConfirmation("Timer not running or no data available.");
     }
 }
+    else if (command.startsWith("SAVE_")) {
+      //SAVE_NightMode_1_0_1_128_60
+       int underscores[5];
+        int lastPos = 5; // Start after "SAVE_"
+        bool formatError = false;
+
+        // Find positions of underscores
+        for (int i = 0; i < 5; i++) {
+            underscores[i] = command.indexOf('_', lastPos);
+            if (underscores[i] == -1) { 
+                formatError = true; 
+                break;
+            }
+            lastPos = underscores[i] + 1;
+        }
+
+        if (formatError) {
+            sendConfirmation("ERROR: Incorrect SAVE format. Use SAVE_name_LED0_LED1_LED2_Brightness_Timer");
+            return;
+        }
+
+        // Extract values safely
+        String profileName = command.substring(5, underscores[0]);
+        int led0 = command.substring(underscores[0] + 1, underscores[1]).toInt();
+        int led1 = command.substring(underscores[1] + 1, underscores[2]).toInt();
+        int led2 = command.substring(underscores[2] + 1, underscores[3]).toInt();
+        int brightness = command.substring(underscores[3] + 1, underscores[4]).toInt();
+        int timerDuration = command.substring(underscores[4] + 1).toInt();
+
+        // Validate LED values (should be 0 or 1)
+        if ((led0 != 0 && led0 != 1) || (led1 != 0 && led1 != 1) || (led2 != 0 && led2 != 1)) {
+            sendConfirmation("ERROR: LED values must be 0 (OFF) or 1 (ON).");
+            return;
+        }
+
+        // Validate brightness (0-255)
+        if (brightness < 0 || brightness > 255) {
+            sendConfirmation("ERROR: Brightness must be between 0 and 255.");
+            return;
+        }
+
+        // Validate timer (must be positive)
+        if (timerDuration <= 0) {
+            sendConfirmation("ERROR: Timer duration must be greater than 0.");
+            return;
+        }
+
+        // Save profile if everything is valid
+        saveProfile(profileName, led0, led1, led2, brightness, timerDuration);
+        sendConfirmation("Saved profile: " + profileName);
+    } 
+    else if (command.startsWith("LOAD_")) {
+        String profileName = command.substring(5);
+        loadProfile(profileName);
+        sendConfirmation("Loaded profile: " + profileName);
+    } 
+    else if (command.startsWith("APP_")) {
+        // New command format: APP_LED_LED_LED_BRIGHTNESS_TIMER
+        int underscores[4];
+        int lastPos = 4; // Start after "APP_"
+        bool formatError = false;
+
+        // Find positions of underscores
+        for (int i = 0; i < 4; i++) {
+            underscores[i] = command.indexOf('_', lastPos);
+            if (underscores[i] == -1) { 
+                formatError = true; 
+                break;
+            }
+            lastPos = underscores[i] + 1;
+        }
+
+        if (formatError) {
+            sendConfirmation("ERROR: Incorrect APP format. Use APP_LED_LED_LED_BRIGHTNESS_TIMER");
+            return;
+        }
+
+        // Extract values safely
+        int led0 = command.substring(4, underscores[0]).toInt();
+        int led1 = command.substring(underscores[0] + 1, underscores[1]).toInt();
+        int led2 = command.substring(underscores[1] + 1, underscores[2]).toInt();
+        int brightness = command.substring(underscores[2] + 1, underscores[3]).toInt();
+        int timerDuration = command.substring(underscores[3] + 1).toInt();
+
+        // Validate LED values (should be 0 or 1)
+        if ((led0 != 0 && led0 != 1) || (led1 != 0 && led1 != 1) || (led2 != 0 && led2 != 1)) {
+            sendConfirmation("ERROR: LED values must be 0 (OFF) or 1 (ON).");
+            return;
+        }
+
+        // Validate brightness (0-255)
+        if (brightness < 0 || brightness > 255) {
+            sendConfirmation("ERROR: Brightness must be between 0 and 255.");
+            return;
+        }
+
+        // Validate timer (must be positive)
+        if (timerDuration <= 0) {
+            sendConfirmation("ERROR: Timer duration must be greater than 0.");
+            return;
+        }
+
+        // Apply the values
+        leds.at(0).light(led0);
+        leds.at(1).light(led1);
+        leds.at(2).light(led2);
+        leds.at(0).changeBrightness(brightness);
+        leds.at(1).changeBrightness(brightness);
+        leds.at(2).changeBrightness(brightness);
+        xQueueSend(durationQueue, &timerDuration, portMAX_DELAY); // Send duration to timer task
+
+        sendConfirmation("Set LEDs: " + String(led0) + ", " + String(led1) + ", " + String(led2) + 
+                         " | Brightness: " + String(brightness) + 
+                         " | Timer: " + String(timerDuration) + " seconds");
+    }
     else {
         sendConfirmation("Invalid command received");
     }
 }
+void saveProfile(String profileName, int led0, int led1, int led2, int brightness, int timerDuration) {
+    preferences.begin("profiles", false); // Open storage with namespace "profiles"
+    
+    preferences.putInt((profileName + "_led0").c_str(), led0);
+    preferences.putInt((profileName + "_led1").c_str(), led1);
+    preferences.putInt((profileName + "_led2").c_str(), led2);
+    preferences.putInt((profileName + "_brightness").c_str(), brightness);
+    preferences.putInt((profileName + "_timer").c_str(), timerDuration);
+
+    preferences.end(); // Close storage
+    Serial.println("Profile saved: " + profileName);
+}
+
+void loadProfile(String profileName) {
+    preferences.begin("profiles", true); // Read mode
+
+    int led0 = preferences.getInt((profileName + "_led0").c_str(), 0);
+    int led1 = preferences.getInt((profileName + "_led1").c_str(), 0);
+    int led2 = preferences.getInt((profileName + "_led2").c_str(), 0);
+    int brightness = preferences.getInt((profileName + "_brightness").c_str(), 255);
+    int timerDuration = preferences.getInt((profileName + "_timer").c_str(), 30);
+
+    preferences.end();
+
+    // Apply the loaded values (simulates loading default pressure values)
+    leds.at(0).light(led0);
+    leds.at(1).light(led1);
+    leds.at(2).light(led2);
+    leds.at(0).changeBrightness(brightness);
+    leds.at(1).changeBrightness(brightness);
+    leds.at(2).changeBrightness(brightness);
+    timeoutClock.stopwatch(timerDuration);
+
+    Serial.println("Profile loaded: " + profileName);
+}
+
+
 void shutdownTimerTask(void *param) {
     int shutdownTime = *(int *)param;
     vTaskDelay(pdMS_TO_TICKS(shutdownTime * 1000)); // Wait for the timeout
