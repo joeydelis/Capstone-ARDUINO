@@ -1,0 +1,6 @@
+# Wokwi Configuration File
+# Reference: https://docs.wokwi.com/vscode/project-config
+[wokwi]
+version = 1
+firmware = '/home/jroundtree/ESP32_GENERIC_S3-20241129-v1.24.1.bin'
+elf = '/home/jroundtree/ESP32_GENERIC_S3-20241129-v1.24.1.elf'
