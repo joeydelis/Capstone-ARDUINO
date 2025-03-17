@@ -78,7 +78,7 @@ class __FlashStringHelper;
 
 #if defined(ARDUINO_ARCH_AVR)
 
-  #include <avr/pgmspace.h>
+  #include <pgmspace.h>
   #define AUNIT_F(x) F(x)
 
 // Seeeduino SAMD21 Core is buggy, so we have to hack around it. Unfortunately,
@@ -94,7 +94,7 @@ class __FlashStringHelper;
   || defined(SEEED_WIO_TERMINAL) \
   || defined(SEEED_GROVE_UI_WIRELESS)
 
-  #include <avr/pgmspace.h>
+  #include <pgmspace.h>
 
   // Seeeduino (as of 1.8.4) provides an incorrect definition of FPSTR()
   // so we have to clobber it.
@@ -108,7 +108,7 @@ class __FlashStringHelper;
 // we get here.
 #elif defined(ARDUINO_ARCH_SAMD)
 
-  #include <avr/pgmspace.h>
+  #include <pgmspace.h>
   #define AUNIT_F(x) F(x)
 
 #elif defined(ESP8266)
@@ -128,7 +128,7 @@ class __FlashStringHelper;
 
 #elif defined(ARDUINO_ARCH_STM32)
 
-  #include <avr/pgmspace.h>
+  #include <pgmspace.h>
   #define AUNIT_F(x) F(x)
 
 #elif defined(EPOXY_DUINO)
@@ -145,7 +145,7 @@ class __FlashStringHelper;
 
   #warning Untested platform, AUnit may still work...
 
-  #include <avr/pgmspace.h>
+  #include <pgmspace.h>
   #define AUNIT_F(x) F(x)
 
   #if ! defined(SERIAL_PORT_MONITOR)

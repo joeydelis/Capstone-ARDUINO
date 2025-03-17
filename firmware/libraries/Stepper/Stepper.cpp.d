@@ -1,5 +1,5 @@
 /home/jroundtree/5911/Capstone-ARDUINO/firmware/libraries/Stepper/Stepper.cpp.o: \
- /home/jroundtree/5911/Capstone-ARDUINO/libraries/Stepper/src/Stepper.cpp \
+ /home/jroundtree/5911/Capstone-ARDUINO/wokwi_lib/Stepper/src/Stepper.cpp \
  /home/jroundtree/.arduino15/packages/esp32/hardware/esp32/3.1.1/cores/esp32/Arduino.h \
  /home/jroundtree/.arduino15/packages/esp32/hardware/esp32/3.1.1/cores/esp32/esp_arduino_version.h \
  /home/jroundtree/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.3-cfea4f7c-v1/esp32s3/include/freertos/FreeRTOS-Kernel/include/freertos/FreeRTOS.h \
@@ -153,4 +153,4 @@
  /home/jroundtree/.arduino15/packages/esp32/hardware/esp32/3.1.1/cores/esp32/freertos_stats.h \
  /home/jroundtree/.arduino15/packages/esp32/hardware/esp32/3.1.1/cores/esp32/io_pin_remap.h \
  /home/jroundtree/.arduino15/packages/esp32/hardware/esp32/3.1.1/cores/esp32/Arduino.h \
- /home/jroundtree/5911/Capstone-ARDUINO/libraries/Stepper/src/Stepper.h
+ /home/jroundtree/5911/Capstone-ARDUINO/wokwi_lib/Stepper/src/Stepper.h

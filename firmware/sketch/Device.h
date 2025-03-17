@@ -9,7 +9,7 @@
 #define PAUSE  50
 #define ON 150
 #define OFF 0
-static esp_task_wdt_user_handle_t changeBrightness_twdt_user_hdl;
+
 // analogWrite is used instead of digital write to tue more control of the power given to the device
 
 
@@ -22,19 +22,60 @@ static esp_task_wdt_user_handle_t changeBrightness_twdt_user_hdl;
 struct Device{
   // State state = ready;
   int power =0; 
-  int pin;
+  
 };
-struct Motor : Device{
-  int positionX;
-  int positionY;
-  int rotation;
+struct Driver : Device{
+  private:
+  Stepper* motorDriver;
+  // stepper motor driver pins used with the esp32
+  // currently assuming 3 pins are needed
+  int enablePin=0;
+  int dirPin=0;
+  int stepPin=0;
+  // unused pin for stepper function;
+  int fourthPin=48;
+  // steps needed to complete a revolution
+  int revolutions= 360;
+  int speed=0;
+  // the pace in which the motor will move at each step
+  int step=5;
+  public: 
 
-  int pin2;
-  int pin3;
-  int pin4;
+  void createStepper(int enable,int dir, int step, int last){
+    this->enablePin = enable;
+    this->dirPin = dir;
+    this->stepPin = step;
+    this->fourthPin = last;
+    Stepper newMotorDriver(this->revolutions, this->enablePin,this->dirPin, this->stepPin, this->fourthPin );
+    this->motorDriver =(Stepper*) calloc(1,sizeof(newMotorDriver));
+    *this->motorDriver = newMotorDriver;
+  }
+
+  void setSpeed(int stepSpeed){
+  this->speed = stepSpeed;
+  this->motorDriver->setSpeed(this->speed);
+  }
+
+  int getSpeed(){
+    return this->speed;
+  }
+  int getStep(){
+    return this->step;
+  }
+  void setStep(int newStep){
+    this->step = newStep;
+    this->motorDriver->step(this->step);
+  }
+  void emergencyStop(){
+     this->speed = 0;
+    this->motorDriver->step(this->speed);
+  }
+
+
+
 };
 struct LED : Device{
- 
+int pin;
 
 // LED Control Functions
 
@@ -73,16 +114,16 @@ void light(int state) {
 */
 void changeBrightness(int level) {
   if (power <level){ 
-    while (power <= level) { // increase brightness gradually until desired level is met
+    while (power != level) { // increase brightness gradually until desired level is met
       analogWrite(pin, power);
-      wait((unsigned long)50); // wait is used instead of delay because it allows other operations to happen when this is running
+      wait((unsigned long)5); // wait is used instead of delay because it allows other operations to happen when this is running
       power++;
       
     }
   } else if (power > level){
-    while (power >= level) { // decrease brightness gradually untill desired level is met
+    while (power != level) { // decrease brightness gradually untill desired level is met
       analogWrite(pin, power);
-      wait((unsigned long) 50);
+      wait((unsigned long) 5);
       power--;
     }
   }

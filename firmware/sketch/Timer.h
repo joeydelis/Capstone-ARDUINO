@@ -13,7 +13,7 @@
 // Time
 QueueHandle_t timeQueue; // for the two tasks
 QueueHandle_t timeRequestQueue; // for time watcher and BLE
-static esp_task_wdt_user_handle_t wait_twdt_user_hdl;
+
 
 enum TimerState {
   Run, 

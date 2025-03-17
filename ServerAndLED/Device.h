@@ -113,16 +113,16 @@ void light(int state) {
 */
 void changeBrightness(int level) {
   if (power <level){ 
-    while (power <= level) { // increase brightness gradually until desired level is met
+    while (power != level) { // increase brightness gradually until desired level is met
       analogWrite(pin, power);
-      wait((unsigned long)50); // wait is used instead of delay because it allows other operations to happen when this is running
+      wait((unsigned long)5); // wait is used instead of delay because it allows other operations to happen when this is running
       power++;
       
     }
   } else if (power > level){
-    while (power >= level) { // decrease brightness gradually untill desired level is met
+    while (power != level) { // decrease brightness gradually untill desired level is met
       analogWrite(pin, power);
-      wait((unsigned long) 50);
+      wait((unsigned long) 5);
       power--;
     }
   }

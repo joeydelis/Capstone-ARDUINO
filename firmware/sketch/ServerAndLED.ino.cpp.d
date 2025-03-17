@@ -188,5 +188,35 @@
  /home/jroundtree/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.3-cfea4f7c-v1/esp32s3/include/freertos/FreeRTOS-Kernel/include/freertos/projdefs.h \
  /home/jroundtree/.arduino15/packages/esp32/tools/esp32-arduino-libs/idf-release_v5.3-cfea4f7c-v1/esp32s3/include/esp_system/include/esp_task_wdt.h \
  /home/jroundtree/5911/Capstone-ARDUINO/firmware/sketch/Device.h \
- /home/jroundtree/5911/Capstone-ARDUINO/libraries/Stepper/src/Stepper.h \
- /home/jroundtree/5911/Capstone-ARDUINO/firmware/sketch/Governor.h
+ /home/jroundtree/5911/Capstone-ARDUINO/wokwi_lib/Stepper/src/Stepper.h \
+ /home/jroundtree/5911/Capstone-ARDUINO/firmware/sketch/Governor.h \
+ /home/jroundtree/5911/Capstone-ARDUINO/libraries/AUnit/src/AUnit.h \
+ /home/jroundtree/5911/Capstone-ARDUINO/libraries/AUnit/src/aunit/print64.h \
+ /home/jroundtree/.arduino15/packages/esp32/hardware/esp32/3.1.1/cores/esp32/Print.h \
+ /home/jroundtree/5911/Capstone-ARDUINO/libraries/AUnit/src/aunit/Verbosity.h \
+ /home/jroundtree/5911/Capstone-ARDUINO/libraries/AUnit/src/aunit/Compare.h \
+ /home/jroundtree/5911/Capstone-ARDUINO/libraries/AUnit/src/aunit/Printer.h \
+ /home/jroundtree/5911/Capstone-ARDUINO/libraries/AUnit/src/aunit/Test.h \
+ /home/jroundtree/5911/Capstone-ARDUINO/libraries/AUnit/src/aunit/FCString.h \
+ /home/jroundtree/5911/Capstone-ARDUINO/libraries/AUnit/src/aunit/Verbosity.h \
+ /home/jroundtree/5911/Capstone-ARDUINO/libraries/AUnit/src/aunit/Assertion.h \
+ /home/jroundtree/5911/Capstone-ARDUINO/libraries/AUnit/src/aunit/Flash.h \
+ /home/jroundtree/5911/Capstone-ARDUINO/libraries/AUnit/src/aunit/Test.h \
+ /home/jroundtree/5911/Capstone-ARDUINO/libraries/AUnit/src/aunit/MetaAssertion.h \
+ /home/jroundtree/5911/Capstone-ARDUINO/libraries/AUnit/src/aunit/Printer.h \
+ /home/jroundtree/5911/Capstone-ARDUINO/libraries/AUnit/src/aunit/Assertion.h \
+ /home/jroundtree/5911/Capstone-ARDUINO/libraries/AUnit/src/aunit/TestOnce.h \
+ /home/jroundtree/5911/Capstone-ARDUINO/libraries/AUnit/src/aunit/MetaAssertion.h \
+ /home/jroundtree/5911/Capstone-ARDUINO/libraries/AUnit/src/aunit/TestAgain.h \
+ /home/jroundtree/5911/Capstone-ARDUINO/libraries/AUnit/src/aunit/TestRunner.h \
+ /home/jroundtree/5911/Capstone-ARDUINO/libraries/AUnit/src/aunit/AssertMacros.h \
+ /home/jroundtree/5911/Capstone-ARDUINO/libraries/AUnit/src/aunit/MetaAssertMacros.h \
+ /home/jroundtree/5911/Capstone-ARDUINO/libraries/AUnit/src/aunit/TestMacros.h \
+ /home/jroundtree/5911/Capstone-ARDUINO/libraries/AUnit/src/aunit/TestOnce.h \
+ /home/jroundtree/5911/Capstone-ARDUINO/libraries/AUnit/src/aunit/TestAgain.h \
+ /home/jroundtree/5911/Capstone-ARDUINO/firmware/sketch/tests/AunitTests.cpp \
+ /home/jroundtree/5911/Capstone-ARDUINO/libraries/AUnit/src/aunit/TestRunner.h \
+ /home/jroundtree/5911/Capstone-ARDUINO/libraries/AUnit/src/aunit/AssertMacros.h \
+ /home/jroundtree/5911/Capstone-ARDUINO/firmware/sketch/tests/NonBLETestsNano.h \
+ /home/jroundtree/5911/Capstone-ARDUINO/firmware/sketch/tests/NonBLETestsPhysical.h \
+ /home/jroundtree/5911/Capstone-ARDUINO/firmware/sketch/tests/NonBLETestsWokwi.h

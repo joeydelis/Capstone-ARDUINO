@@ -155,7 +155,6 @@ void timeWatcher(void * params){
 
 void setup() {
     Serial.begin(115200);
-    Serial.println("Starting BLE Server...");
     esp_task_wdt_deinit();
     // Creating a queue that only holds the current time.
     timeQueue = xQueueCreate(1, sizeof(int));
@@ -163,6 +162,8 @@ void setup() {
     // Initialize LEDs
 
     // leds = {};//(LED*)calloc(sizeof(LED),3); // assigning memory to each LED struct
+    #ifndef TESTING
+    Serial.println("Starting BLE Server...");
     leds.at(0).pin = PIN_LED0;
     leds.at(1).pin = PIN_LED1;
     leds.at(2).pin = PIN_LED2;
@@ -171,7 +172,6 @@ void setup() {
     pinMode(leds.at(2).pin, OUTPUT);
 
 
-    #ifndef TESTING
     // Initialize BLE
     BLEDevice::init("ESP32_BLE_Server");
     pServer = BLEDevice::createServer();
@@ -230,7 +230,7 @@ void setup() {
       #endif
        #ifdef WOKWI
         TestRunner::exclude("*");
-        TestRunner::include("*Wokwi","*");
+        TestRunner::include("NonBLETestsWokwi","*");
       #endif
        #ifdef NANO
         TestRunner::exclude("*");

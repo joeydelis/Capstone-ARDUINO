@@ -5,6 +5,7 @@
 #define WDT_TIMEOUT 60000 // 60 seconds for timeout
 #define POWERLIMIT 150
 #define RECOVER 0
+#define SPEEDLIMIT 30;
 /*
 * The role of the Governor is to make sure that the device stays within 
 * safe operation.
