@@ -3,12 +3,23 @@
 #include <BLEUtils.h>
 #include <BLE2902.h>
 #include <vector>
-
+#include "Shared.h"
 #include "Timer.h"
 #include "Device.h"
 #include "Governor.h"
 #define SERVICE_UUID        "12345678-1234-5678-1234-56789abcdef0"
 #define CHARACTERISTIC_UUID "abcd1234-5678-1234-5678-abcdef123456"
+
+/*
+  Build property flags
+*/
+// #define PRODUCTION
+// #define TESTING
+// #define BLETEST
+// #ifdef TESTING
+#include <AUnit.h>
+#include "tests/AunitTests.cpp"
+// #endif
 
 // Predefined pins that are used with the test esp32 device
 #define PIN_LED0 27
@@ -48,6 +59,11 @@ class MyServerCallbacks : public BLEServerCallbacks {
 
 // Function to process commands received via BLE
 void processCommand(String command) {
+  // testing for the speed requirement
+  #ifdef BLETEST
+  long initialTimeBLE = millis();
+  #endif
+
     if (command.startsWith("ON_")) {
         int led = command.substring(3).toInt();
         // light(getLedPin(led));
@@ -89,6 +105,10 @@ void processCommand(String command) {
     else {
         sendConfirmation("Invalid command received");
     }
+    #ifdef BLETEST
+  long totalTimeBLE = millis() - initialTime;
+  Serial.print("Command and Confirmation took " + totalTimeBLE+"ms");
+  #endif
 }
 // Callback to process received BLE messages
 class MyCallbacks : public BLECharacteristicCallbacks {
@@ -105,11 +125,7 @@ class MyCallbacks : public BLECharacteristicCallbacks {
 };
 
 
-void loop() {
-    // The main logic is handled by the BLE callback; no need to put logic in loop.
-  // stopwatch.stopwatch(60);
 
-}
 
 /*
   Starts timer task
@@ -155,6 +171,7 @@ void setup() {
     pinMode(leds.at(2).pin, OUTPUT);
 
 
+    #ifndef TESTING
     // Initialize BLE
     BLEDevice::init("ESP32_BLE_Server");
     pServer = BLEDevice::createServer();
@@ -183,12 +200,10 @@ void setup() {
     pServer->getAdvertising()->start();
 
     Serial.println("BLE Server Started. Waiting for connections...");
-
+    #endif
     /*
       XtaskCreatePinnedToCore will create a separate task that will run along with the main program
       and assign it to a given core.
-
-      Will need to make sure that these tasks don't interfere will the bluetooth connection
     */
     xTaskCreatePinnedToCore(
         timeWatcher, 
@@ -208,7 +223,20 @@ void setup() {
         &timeWatcherTaskHandler,
         0
       );
-
+    #ifdef TESTING
+      #ifdef DOIT
+        TestRunner::exclude("*");
+        TestRunner::include("*DOIT","*");
+      #endif
+       #ifdef WOKWI
+        TestRunner::exclude("*");
+        TestRunner::include("*Wokwi","*");
+      #endif
+       #ifdef NANO
+        TestRunner::exclude("*");
+        TestRunner::include("*Nano","*");
+      #endif
+    #endif
  }
  // Helper function to get LED pin from index
 int getLedPin(int ledIndex) {
@@ -228,4 +256,13 @@ void sendConfirmation(String message) {
     }
 }
 
+void loop() {
+    // Testing space
+   
 
+    #ifdef TESTING
+      TestRunner::run();
+    #endif
+  
+
+}
