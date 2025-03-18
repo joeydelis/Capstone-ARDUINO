@@ -14,7 +14,7 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: aunit test 
-              run: apt get install arduino-cli;rm firmware/* -rf;arduino-cli compile -b esp32:esp32:esp32s3 ServerAndLED/ --build-path firmware/ --libraries libraries/ --libraries wokwi_lib --build-property build.extra_flags="-DTESTING -DWOKWI"; wokwi-cli > results.log; cat results.log
+              run: sudo apt -y install arduino-cli;rm firmware/* -rf;arduino-cli compile -b esp32:esp32:esp32s3 ServerAndLED/ --build-path firmware/ --libraries libraries/ --libraries wokwi_lib --build-property build.extra_flags="-DTESTING -DWOKWI"; wokwi-cli > results.log; cat results.log
             
 
 
