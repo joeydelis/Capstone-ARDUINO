@@ -16,8 +16,7 @@ jobs:
             with:
                 fqbn: esp32:esp32:nano_nora
                 libraries: |
-                -name: aunit
-                -name: Stepper
+                    -name: Stepper
                 sketch-paths: |
                     - ServerAndLED
                 
