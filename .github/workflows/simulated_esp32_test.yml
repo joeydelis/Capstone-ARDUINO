@@ -2,27 +2,7 @@
 name: ESP-32 Super-Linter
 
 jobs:
-#     motorTests:
-#         name: Wokwi Motor tests
-#         runs-on: ubuntu-latest
-#
-#         steps:
-#             name: Checkout code
-#             uses: actions/checkout@v4
-#             with:
-#                 submodules: "recursive"
-#             -name: Simulated esp32 Motor tests
-#             uses: wokwi/wokwi-ci-action@v1
-#             with:
-#                 token: ${{ secrets.WOKWI_CLI_TOKEN }}
-#                 path: '/wokwi.toml'
-#                 timeout: 10000
-#                 steps:
-#                 -set-control:
-#                     part-id: stepper1
-#                     control:
-#
-    aunitTests:
+    aunit-tests:
         name: Wokwi aunit tests
         runs-on: ubuntu-latest
         steps:

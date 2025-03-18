@@ -1,3 +1,4 @@
+# This tests that the sketch can compile on the target device esp32 nano
 name: ESP-32 Super-Linter
 
 on: push
@@ -19,6 +20,6 @@ jobs:
                     -name: Stepper
                 sketch-paths: |
                     - ServerAndLED
-                
-            
+
+
               
