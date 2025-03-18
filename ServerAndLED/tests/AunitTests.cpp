@@ -21,7 +21,7 @@ class NonBLETestsDOIT: public TestOnce {
     timeRequestQueue = xQueueCreate(1, sizeof(int));
     // Initialize LEDs
 
-    // leds = {};//(LED*)calloc(sizeof(LED),3); // assigning memory to each LED struct
+  
     using std::vector;
     leds.resize(3);
     leds.at(0).pin = 27;
@@ -35,16 +35,7 @@ class NonBLETestsDOIT: public TestOnce {
     
 
   }
-    // void teardown() override {
-     
-    //   leds.at(0).light(0);
-    //   leds.at(1).light(0);
-    //   leds.at(2).light(0);
-      
-      
-
-    //   TestOnce::teardown();
-    // }
+   
    
 };
 
@@ -90,19 +81,19 @@ testF(NonBLETestsDOIT, LEDBrightnessDown){
    assertEqual(leds.at(2).power, 30);
 }
 // //Wait test
-testF(NonBLETestsDOIT, waitWokwi1){
+testF(NonBLETestsDOIT, wait1){
   int timeToWait = 3;
   unsigned long start= millis();
   wait(timeToWait);
   assertLessOrEqual(millis()-start,(unsigned long) timeToWait);
 }
-testF(NonBLETestsDOIT, waitWokwi2){
+testF(NonBLETestsDOIT, wait2){
   int timeToWait = 5;
   unsigned long start= millis();
   wait(timeToWait);
   assertLessOrEqual(millis()-start,(unsigned long) timeToWait);
 }
-testF(NonBLETestsDOIT, waitWokwi3){
+testF(NonBLETestsDOIT, wait3){
   int timeToWait = 10;
   unsigned long start= millis();
   wait(timeToWait);
