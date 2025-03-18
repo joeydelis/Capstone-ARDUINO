@@ -10,8 +10,8 @@ jobs:
             uses: actions/checkout@v4
             with:
                 submodules: 'recursive'
-        - name: Simulated esp32 tests
-        uses: wokwi/wokwi-ci-action@v1
+    name: Simulated esp32 tests
+    uses: wokwi/wokwi-ci-action@v1
         with:
             token: ${{ secrets.WOKWI_CLI_TOKEN }}
             path: '/wokwi.toml'
