@@ -1,0 +1,2 @@
+Wokwi CLI v0.15.3 (d85c2346ef21)
+Connected to Wokwi Simulation API 1.0.0-20250222-g0273d6d1
