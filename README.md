@@ -14,6 +14,9 @@ Unit testing guide
 Requirements:
 Install arduino cli
 
+Esp32 requirements:
+install esptool
+
 Wokwi Requirements:
 Install wokwi cli
 Provide your wokwi api key if testing to wokwi cli
@@ -22,11 +25,22 @@ Build:
 
 To build for the DOIT esp32 build using:
 
+Remove any extra files in firmware:
 rm firmware/* -rf
 
-arduino-cli compile -b esp32:esp32:esp32doit-espduino ServerAndLED/ --build-path firmware/ --libraries libraries/ --libraries wokwi_lib --build-property build.extra_flags="-DTESTING -DDOITI"; 
+Options:
+    Unit Testing:
+    arduino-cli compile -b esp32:esp32:esp32doit-espduino ServerAndLED/ --build-path firmware/ --libraries libraries/ --libraries wokwi_lib --build-property build.extra_flags="-DTESTING -DDOIT"
 
-then load firmware to the esp32.
+    BLE performance testing:
+    arduino-cli compile -b esp32:esp32:esp32doit-espduino ServerAndLED/ --build-path firmware/ --libraries libraries/ --libraries wokwi_lib --build-property build.extra_flags="-DBLETEST"
+
+
+then load firmware to the esp32 with (port depends on what computer you're using):
+
+
+esptool --chip esp32 --port "/dev/ttyUSB0" --baud 921600  --before default_reset --after hard_reset write_flash -z --flash_mode keep --flash_freq keep --flash_size keep 0x10000 "firmware/ServerAndLED.ino.bin"
+
 
 To build for wokwi simulations use:
 
@@ -44,4 +58,4 @@ To build for Nano esp32s3 use: (FQBN may have to be changed to arduino:esp32:nan
 
 rm firmware/* -rf
 
-arduino-cli compile -b esp32:esp32:nano_nora ServerAndLED/ --build-path firmware/ --libraries libraries/ --libraries wokwi_lib --build-property build.extra_flags="-DTESTING -DDOITI"; 
+arduino-cli compile -b esp32:esp32:nano_nora ServerAndLED/ --build-path firmware/ --libraries libraries/ --libraries wokwi_lib --build-property build.extra_flags="-DTESTING -DDOITI"

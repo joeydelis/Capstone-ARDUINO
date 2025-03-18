@@ -99,15 +99,15 @@ void processCommand(String command) {
         unsigned long currentTime;
         xQueueReceiveFromISR(timeRequestQueue, &currentTime,&xTaskWokenByReceive2);
 
-        Serial.print(currentTime);
+        Serial.println(currentTime);
         sendConfirmation("Time: " + String(currentTime));
     } 
     else {
         sendConfirmation("Invalid command received");
     }
-    #ifdef BLETEST
-  long totalTimeBLE = millis() - initialTime;
-  Serial.print("Command and Confirmation took " + totalTimeBLE+"ms");
+  #ifdef BLETEST
+  long totalTimeBLE = millis() - initialTimeBLE;
+  Serial.println("Command and Confirmation took " + String(totalTimeBLE) +"ms");
   #endif
 }
 // Callback to process received BLE messages
@@ -226,7 +226,7 @@ void setup() {
     #ifdef TESTING
       #ifdef DOIT
         TestRunner::exclude("*");
-        TestRunner::include("*DOIT","*");
+        TestRunner::include("NonBLETestsDOIT","*");
       #endif
        #ifdef WOKWI
         TestRunner::exclude("*");
@@ -234,7 +234,7 @@ void setup() {
       #endif
        #ifdef NANO
         TestRunner::exclude("*");
-        TestRunner::include("*Nano","*");
+        TestRunner::include("NonBLETestsNano","*");
       #endif
     #endif
  }

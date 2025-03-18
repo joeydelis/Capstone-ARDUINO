@@ -11,14 +11,14 @@ using namespace aunit;
 class NonBLETestsDOIT: public TestOnce {
    protected:
     std::vector<LED> leds;
+    Driver stepperMotor;
   void setup() override{
     TestOnce::setup();
     Serial.begin(115200);
-    Serial.println("Starting BLE Server...");
-    esp_task_wdt_deinit();
+   
     // Creating a queue that only holds the current time.
-    timeQueue = xQueueCreate(1, sizeof(int));
-    timeRequestQueue = xQueueCreate(1, sizeof(int));
+    // timeQueue = xQueueCreate(1, sizeof(int));
+    // timeRequestQueue = xQueueCreate(1, sizeof(int));
     // Initialize LEDs
 
   
@@ -31,7 +31,8 @@ class NonBLETestsDOIT: public TestOnce {
     pinMode(leds.at(1).pin, OUTPUT);
     pinMode(leds.at(2).pin, OUTPUT);
 
-  
+  // stepperMotor;
+  // stepperMotor.createStepper(4,9,10,5);
     
 
   }
@@ -52,10 +53,15 @@ testF(NonBLETestsDOIT, LEDOn){
 testF(NonBLETestsDOIT, LEDOff){
  
    leds.at(0).light(1);
-   assertEqual(leds.at(0).power, OFF);
    leds.at(1).light(1);
-   assertEqual(leds.at(1).power, OFF);
    leds.at(2).light(1);
+
+
+   leds.at(0).light(0);
+   leds.at(1).light(0);
+   leds.at(2).light(0);
+   assertEqual(leds.at(0).power, OFF);
+   assertEqual(leds.at(1).power, OFF);
    assertEqual(leds.at(2).power, OFF);
 }
 testF(NonBLETestsDOIT, LEDBrightnessUp){
@@ -76,29 +82,65 @@ testF(NonBLETestsDOIT, LEDBrightnessDown){
   leds.at(0).changeBrightness(brightness);
   leds.at(1).changeBrightness(brightness);
   leds.at(2).changeBrightness(brightness);
-   assertEqual(leds.at(0).power, 30);
-   assertEqual(leds.at(1).power, 30);
-   assertEqual(leds.at(2).power, 30);
+  assertEqual(leds.at(0).power, 30);
+  assertEqual(leds.at(1).power, 30);
+  assertEqual(leds.at(2).power, 30);
 }
 // //Wait test
-testF(NonBLETestsDOIT, wait1){
+testF(NonBLETestsDOIT, waittest1){
   int timeToWait = 3;
   unsigned long start= millis();
   wait(timeToWait);
   assertLessOrEqual(millis()-start,(unsigned long) timeToWait);
 }
-testF(NonBLETestsDOIT, wait2){
+testF(NonBLETestsDOIT, waitTest2){
   int timeToWait = 5;
   unsigned long start= millis();
   wait(timeToWait);
   assertLessOrEqual(millis()-start,(unsigned long) timeToWait);
 }
-testF(NonBLETestsDOIT, wait3){
+testF(NonBLETestsDOIT, waitTest3){
   int timeToWait = 10;
   unsigned long start= millis();
   wait(timeToWait);
   assertLessOrEqual(millis()-start,(unsigned long) timeToWait);
 }
+testF(NonBLETestsDOIT, waitTest4){
+  int timeToWait = 1000;
+  unsigned long start= millis();
+  wait(timeToWait);
+  assertLessOrEqual(millis()-start,(unsigned long) timeToWait);
+}
+testF(NonBLETestsDOIT, waitTest5){
+  int timeToWait = 1000 *5;
+  unsigned long start= millis();
+  wait(timeToWait);
+  assertLessOrEqual(millis()-start,(unsigned long) timeToWait);
+}
+//Motor tests
+
+// TestF(NonBLETestsDOIT, MotorClockwiseTest){
+//   int rpm =5;
+//   stepperMotor.setSpeed(rpm);
+//   stepperMotor.setStep(rpm);
+//   Serial.println("Is the motor spinning clockwise? 1 = yes 0 = no ")
+//   while(Serial.available()){
+
+//   }
+//   int confrm = (int) Serial.parseInt();
+//   assertEqual(confirm, 1)
+// }
+// TestF(NonBLETestsDOIT, MotorCounterClockwiseTest){
+//   int rpm =5;
+//   stepperMotor.setSpeed(rpm);
+//   stepperMotor.setStep(-rpm);
+//   Serial.println("Is the motor spinning counter clockwise? 1 = yes 0 = no ")
+//   while(Serial.available()){
+
+//   }
+//   int confrm = (int) Serial.parseInt();
+//   assertEqual(confirm, 1)
+// }
 /*
 
 Wokwi
@@ -245,11 +287,11 @@ testF(NonBLETestsWokwi, waitWokwi3){
 
 
 
-// class NonBLETestsNano: public TestOnce {
+class NonBLETestsNano: public TestOnce {
 
-//   void setup() override{
-//     TestOnce::setup();
+  void setup() override{
+    TestOnce::setup();
 
 
-//   }
-// };
+  }
+};
