@@ -10,7 +10,7 @@ jobs:
               uses: actions/checkout@v4
               with:
                 submodules: 'recursive'
-            - run: sudo snap install arduino-cli;rm firmware/* -rf;arduino-cli compile -b esp32:esp32:esp32s3 ./ServerAndLED --build-path ./firmware --libraries ./libraries --libraries ./wokwi_lib --build-property build.extra_flags="-DTESTING -DWOKWI"; wokwi-cli > results.log; cat results.log
+            - run: sudo snap install arduino-cli;rm firmware/* -rf;arduino-cli core install esp32:esp32;arduino-cli compile -b esp32:esp32:esp32s3 ./ServerAndLED --build-path ./firmware --libraries ./libraries --libraries ./wokwi_lib --build-property build.extra_flags="-DTESTING -DWOKWI"; wokwi-cli > results.log; cat results.log
             
   
              
