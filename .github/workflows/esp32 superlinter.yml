@@ -16,7 +16,9 @@ jobs:
             uses: arduino/compile-sketches@v1
             with:
                 fqbn: esp32:esp32:nano_nora
-                run: arduino-cli lib install Aunit;arduino-cli lib install Stepper
+                libraries: |
+                    - name: Aunit
+                    - name: Stepper
                 sketch-paths: |
                     - ServerAndLED
 
