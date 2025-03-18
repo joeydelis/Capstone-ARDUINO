@@ -2,15 +2,19 @@
 name: ESP-32 Super-Linter
 on: push
 jobs:
-    aunit-tests:
-        name: Wokwi aunit tests
+    wokwi-checkout:
+        name: checkout for wokwi testing
         runs-on: ubuntu-latest
         steps:
             - name: Checkout code and run test
               uses: actions/checkout@v4
               with:
                 submodules: 'recursive'
-                run: apt get install arduino-cli;rm firmware/* -rf;arduino-cli compile -b esp32:esp32:esp32s3 ServerAndLED/ --build-path firmware/ --libraries libraries/ --libraries wokwi_lib --build-property build.extra_flags="-DTESTING -DWOKWI"; wokwi-cli > results.log; cat results.log
+    wokwi-aunit-tests:
+        runs-on: ubuntu-latest
+        steps:
+            - name: aunit test 
+              run: apt get install arduino-cli;rm firmware/* -rf;arduino-cli compile -b esp32:esp32:esp32s3 ServerAndLED/ --build-path firmware/ --libraries libraries/ --libraries wokwi_lib --build-property build.extra_flags="-DTESTING -DWOKWI"; wokwi-cli > results.log; cat results.log
             
 
 
