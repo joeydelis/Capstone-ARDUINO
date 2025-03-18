@@ -9,7 +9,4 @@ secrets.yml
 Thumbs.db
 
 # Directories
-
-# No longer tracking libraries
-libraries/
 .vscode/
