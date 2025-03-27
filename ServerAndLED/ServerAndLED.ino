@@ -5,12 +5,20 @@
 #include <vector>
 #include <Preferences.h>
 
+#include <Stepper.h>
 #include "Timer.h"
 #include "Device.h"
 #include "Governor.h"
 #define SERVICE_UUID        "12345678-1234-5678-1234-56789abcdef0"
 #define CHARACTERISTIC_UUID "abcd1234-5678-1234-5678-abcdef123456"
 
+
+// Define stepper motor control pins
+#define STEP_PIN 32
+#define DIR_PIN 33
+#define STEPS_PER_REV 200 // Adjust based on your stepper motor specs
+
+Stepper stepper(STEPS_PER_REV, DIR_PIN, STEP_PIN);
 // Predefined pins that are used with the test esp32 device
 #define PIN_LED0 27
 #define PIN_LED1 26
@@ -77,7 +85,16 @@ void processCommand(String command) {
        
         leds.at(led).changeBrightness( brightness);
         sendConfirmation("Set brightness of LED " + String(led) + " to " + String(brightness));
-    }  else if (command.startsWith("TIMER_")) {
+    }  
+    else if (command.equals("UP")) {
+        moveStepper(200); // Move up (adjust steps as needed)
+        sendConfirmation("Stepper moved UP");
+    } 
+    else if (command.equals("DOWN")) {
+        moveStepper(-200); // Move down
+        sendConfirmation("Stepper moved DOWN");
+    } 
+    else if (command.startsWith("TIMER_")) {
     int duration = command.substring(6).toInt();
     if (duration > 0) {
         xQueueSend(durationQueue, &duration, portMAX_DELAY); // Send duration to timer task
@@ -212,6 +229,10 @@ void processCommand(String command) {
     else {
         sendConfirmation("Invalid command received");
     }
+}
+void moveStepper(int steps) {
+    stepper.setSpeed(60); // Adjust speed as needed
+    stepper.step(steps);
 }
 void saveProfile(String profileName, int led0, int led1, int led2, int brightness, int timerDuration) {
     preferences.begin("profiles", false); // Open storage with namespace "profiles"
