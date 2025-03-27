@@ -45,14 +45,15 @@ class MyServerCallbacks : public BLEServerCallbacks {
     void onConnect(BLEServer* pServer) {
         deviceConnected = true;
         Serial.println("Device connected!");
-}
-void onDisconnect(BLEServer* pServer) {
-    deviceConnected = false;
-    Serial.println("Device disconnected! Starting shutdown timer...");
-    BLEDevice::startAdvertising();
-    int shutdownTimeout = 30; // Time in seconds before shutdown
-    xTaskCreate(shutdownTimerTask, "ShutdownTimer", 1000, &shutdownTimeout, 1, NULL);
-}
+        BLEDevice::getAdvertising()->stop(); // Stop advertising to prevent new connections
+    }
+    void onDisconnect(BLEServer* pServer) {
+        deviceConnected = false;
+        Serial.println("Device disconnected! Starting shutdown timer...");
+        BLEDevice::startAdvertising(); // Resume advertising for new connections
+        int shutdownTimeout = 30; // Time in seconds before shutdown
+        xTaskCreate(shutdownTimerTask, "ShutdownTimer", 1000, &shutdownTimeout, 1, NULL);
+    }
 };
 
 // Function to process commands received via BLE
