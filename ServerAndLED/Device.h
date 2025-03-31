@@ -9,6 +9,8 @@
 #define ON 150
 #define OFF 0
 
+#define SPEEDLIMIT 10;
+#define ACCELERATIONLIMIT 4;
 // analogWrite is used instead of digital write to tue more control of the power given to the device
 
 
@@ -73,6 +75,38 @@ struct Driver : Device{
 
 
 };
+struct FlexyDriver : Device
+{
+private:
+  ESP_FlexyStepper motorDriver;
+  float speed;
+  float acceleration;
+public:
+  void createStepper(int motorStepPin,int motorDirectionPin, int emergencyStopPin,int limitSwitchPin){
+    this->motorDriver.connectToPins(motorStepPin, motorStepPin, emergencyStopPin,limitSwitchPin);
+  } 
+  //steps per second
+  void setSpeed(float speed){
+    if(speed < SPEEDLIMIT){
+    this->speed = speed;
+
+    }
+  }
+  float getSpeed(){
+    return this->speed;
+  }
+  void setAccelereation(float acceleration){
+    if(accleration < ACCELERATIONLIMIT){
+      this->acceleration = acceleration;
+    }
+  }
+  float getAcceleration(){
+    return this->acceleration;
+  }
+  
+}
+
+}
 struct LED : Device{
 int pin;
 
