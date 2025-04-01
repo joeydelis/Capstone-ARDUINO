@@ -14,11 +14,15 @@
 
 
 // Define stepper motor control pins
-#define STEP_PIN 32
-#define DIR_PIN 33
-#define STEPS_PER_REV 200 // Adjust based on your stepper motor specs
+#define STEP_PIN_1 32  // Step pin for Motor 1
+#define DIR_PIN_1  33  // Direction pin for Motor 1
+#define STEP_PIN_2 14  // Step pin for Motor 2
+#define DIR_PIN_2  12  // Direction pin for Motor 2
 
-Stepper stepper(STEPS_PER_REV, DIR_PIN, STEP_PIN);
+#define MOTOR_SPEED_DELAY 500 // Microseconds between steps (adjust for speed)
+#define STEPS_PER_REV 200 // Adjust based on your stepper motor specs
+Stepper stepper1(STEPS_PER_REV, DIR_PIN, STEP_PIN);
+Stepper stepper2(STEPS_PER_REV, DIR_PIN_2, STEP_PIN_2);
 // Predefined pins that are used with the test esp32 device
 #define PIN_LED0 27
 #define PIN_LED1 26
@@ -55,6 +59,23 @@ class MyServerCallbacks : public BLEServerCallbacks {
         xTaskCreate(shutdownTimerTask, "ShutdownTimer", 1000, &shutdownTimeout, 1, NULL);
     }
 };
+void moveStepper(int steps) {
+    bool direction = steps > 0;  // Determine direction (UP or DOWN)
+    
+    digitalWrite(DIR_PIN_1, direction);
+    digitalWrite(DIR_PIN_2, direction);
+    
+    steps = abs(steps); // Ensure step count is positive
+
+    for (int i = 0; i < steps; i++) {
+        digitalWrite(STEP_PIN_1, HIGH);
+        digitalWrite(STEP_PIN_2, HIGH);
+        delayMicroseconds(5); // DM556T requires at least 2.5µs HIGH pulse
+        digitalWrite(STEP_PIN_1, LOW);
+        digitalWrite(STEP_PIN_2, LOW);
+        delayMicroseconds(MOTOR_SPEED_DELAY); // Adjust for smooth motion
+    }
+}
 
 // Function to process commands received via BLE
 void processCommand(String command) {
@@ -231,10 +252,7 @@ void processCommand(String command) {
         sendConfirmation("Invalid command received");
     }
 }
-void moveStepper(int steps) {
-    stepper.setSpeed(60); // Adjust speed as needed
-    stepper.step(steps);
-}
+
 void saveProfile(String profileName, int led0, int led1, int led2, int brightness, int timerDuration) {
     preferences.begin("profiles", false); // Open storage with namespace "profiles"
     
@@ -338,6 +356,16 @@ void setup() {
     // Creating a queue that only holds the current time.
     timeQueue = xQueueCreate(1, sizeof(int));
     timeRequestQueue = xQueueCreate(1, sizeof(int));
+        // Configure stepper driver pins as OUTPUT
+    pinMode(ENA_PIN_1, OUTPUT);
+    pinMode(ENA_PIN_2, OUTPUT);
+    digitalWrite(ENA_PIN_1, LOW); // Enable the driver (LOW = Enabled)
+    digitalWrite(ENA_PIN_2, LOW);
+
+    pinMode(STEP_PIN_1, OUTPUT);
+    pinMode(DIR_PIN_1, OUTPUT);
+    pinMode(STEP_PIN_2, OUTPUT);
+    pinMode(DIR_PIN_2, OUTPUT);
     // Initialize LEDs
 
     // leds = {};//(LED*)calloc(sizeof(LED),3); // assigning memory to each LED struct
