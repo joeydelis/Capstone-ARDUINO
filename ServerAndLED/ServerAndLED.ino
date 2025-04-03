@@ -12,6 +12,8 @@
 #define SERVICE_UUID        "12345678-1234-5678-1234-56789abcdef0"
 #define CHARACTERISTIC_UUID "abcd1234-5678-1234-5678-abcdef123456"
 
+#define ENA_PIN_1  4  // Adjust based on wiring/if needed by driver
+#define ENA_PIN_2  5  
 
 // Define stepper motor control pins
 #define STEP_PIN_1 32  // Step pin for Motor 1
@@ -21,8 +23,9 @@
 
 #define MOTOR_SPEED_DELAY 500 // Microseconds between steps (adjust for speed)
 #define STEPS_PER_REV 200 // Adjust based on your stepper motor specs
-Stepper stepper1(STEPS_PER_REV, DIR_PIN, STEP_PIN);
+Stepper stepper1(STEPS_PER_REV, DIR_PIN_1, STEP_PIN_1);
 Stepper stepper2(STEPS_PER_REV, DIR_PIN_2, STEP_PIN_2);
+
 // Predefined pins that are used with the test esp32 device
 #define PIN_LED0 27
 #define PIN_LED1 26
