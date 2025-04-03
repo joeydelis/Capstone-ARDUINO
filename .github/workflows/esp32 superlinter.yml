@@ -19,7 +19,7 @@ jobs:
                 libraries: |
                     - name: Aunit
                     - name: Stepper
-                    - name: ESP_FlexyStepper
+                    - name: ESP-FlexyStepper
                 sketch-paths: |
                     - ServerAndLED
 
