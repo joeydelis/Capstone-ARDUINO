@@ -14,8 +14,10 @@
 
 // analogWrite is used instead of digital write to tue more control of the power given to the device
 
-const float speedLimit = 10;
 const float accelerationLimit =4;
+const float decelerationLimit =4;
+const float speedLimit = 10;
+const int stepLimit = 5;
 
 /*
   Device
@@ -55,8 +57,10 @@ struct Driver : Device{
   }
 
   void setSpeed(int stepSpeed){
-  this->speed = stepSpeed;
-  this->motorDriver->setSpeed(this->speed);
+    if(stepSpeed < speedLimit && stepSpeed >=0){
+      this->speed = stepSpeed;
+      this->motorDriver->setSpeed(this->speed);
+    }
   }
 
   int getSpeed(){
@@ -66,8 +70,10 @@ struct Driver : Device{
     return this->step;
   }
   void setStep(int newStep){
-    this->step = newStep;
-    this->motorDriver->step(this->step);
+    if(newStep < stepLimit && newStep>=0 ){
+      this->step = newStep;
+      this->motorDriver->step(this->step);
+    }
   }
   void emergencyStop(){
      this->speed = 0;
@@ -107,6 +113,14 @@ public:
   }
   float getAcceleration(){
     return this->acceleration;
+  }
+    void setDecelereation(float deceleration){
+    if(deceleration < decelerationLimit){
+      this->deceleration = deceleration;
+    }
+  }
+  float getDeceleration(){
+    return this->deceleration;
   }
   void startMotor(){
     this->motorDriver.startAsService();
