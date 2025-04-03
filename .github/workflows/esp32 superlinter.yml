@@ -3,29 +3,20 @@ name: ESP-32 Super-Linter
 on: push
 
 jobs:
-    build:
-        name: Build Arduino Sketch
+    super-lint:
+        name: Build Arduino IDE Skectch
         runs-on: ubuntu-latest
         steps:
           - name: Checkout code
             uses: actions/checkout@v4
             with:
                 submodules: 'recursive'
-
-          - name: Install Arduino CLI
-            run: |
-                curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | sh
-                echo "$HOME/bin" >> $GITHUB_PATH
-                echo "PATH=$HOME/bin:$PATH" >> $GITHUB_ENV
-                source $GITHUB_ENV
-                arduino-cli version  # Verify installation
-
-          - name: Install ESP32 Core
-            run: |
-                arduino-cli core update-index
-                arduino-cli core install esp32:esp32
-                arduino-cli board listall esp32:esp32  # List available ESP32 boards
-
-          - name: Compile Sketch
-            run: |
-                arduino-cli compile --fqbn esp32:esp32:nano_nora ServerAndLED
+          - name: Arduino IDE
+            uses: arduino/compile-sketches@v1
+            with:
+                fqbn: esp32:esp32:nano_nora
+                sketch-paths: |
+                    - ServerAndLED
+                
+            
+              
