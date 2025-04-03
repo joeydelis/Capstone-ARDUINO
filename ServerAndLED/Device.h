@@ -1,5 +1,8 @@
+
 #include "esp_task_wdt.h"
 #include  <Stepper.h>
+#include <ESP_FlexyStepper.h>
+
 /*
   Device will hold the characteristics for each device
   This will be usefu to keep track of each pin values for safety monitor and reporting back to the app.
@@ -9,11 +12,10 @@
 #define ON 150
 #define OFF 0
 
-#define SPEEDLIMIT 10;
-#define ACCELERATIONLIMIT 4;
 // analogWrite is used instead of digital write to tue more control of the power given to the device
 
-
+const float speedLimit = 10;
+const float accelerationLimit =4;
 
 /*
   Device
@@ -79,15 +81,18 @@ struct FlexyDriver : Device
 {
 private:
   ESP_FlexyStepper motorDriver;
+  
   float speed;
   float acceleration;
+  float deceleration;
 public:
   void createStepper(int motorStepPin,int motorDirectionPin, int emergencyStopPin,int limitSwitchPin){
-    this->motorDriver.connectToPins(motorStepPin, motorStepPin, emergencyStopPin,limitSwitchPin);
+    
+    this->motorDriver.connectToPins(motorStepPin, motorDirectionPin, false);
   } 
   //steps per second
   void setSpeed(float speed){
-    if(speed < SPEEDLIMIT){
+    if(speed < speedLimit){
     this->speed = speed;
 
     }
@@ -96,17 +101,19 @@ public:
     return this->speed;
   }
   void setAccelereation(float acceleration){
-    if(accleration < ACCELERATIONLIMIT){
+    if(acceleration < accelerationLimit){
       this->acceleration = acceleration;
     }
   }
   float getAcceleration(){
     return this->acceleration;
   }
-  
-}
+  void startMotor(){
+    this->motorDriver.startAsService();
+  }
 
-}
+
+};
 struct LED : Device{
 int pin;
 
