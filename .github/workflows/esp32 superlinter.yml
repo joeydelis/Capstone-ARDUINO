@@ -16,7 +16,9 @@ jobs:
             run: |
                 curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | sh
                 echo "$HOME/bin" >> $GITHUB_PATH
-                arduino-cli config init
+                echo "PATH=$HOME/bin:$PATH" >> $GITHUB_ENV
+                source $GITHUB_ENV
+                arduino-cli version  # Verify installation
 
           - name: Install ESP32 Core
             run: |
