@@ -22,22 +22,33 @@
 // #endif
 
 // Predefined pins that are used with the test esp32 device
-#define PIN_LED0 27
-#define PIN_LED1 26
-#define PIN_LED2 25
+// #define PIN_LED0 27
+// #define PIN_LED1 26
+// #define PIN_LED2 25
+
+// Nano pins
+#define PIN_LED0 1
+#define PIN_LED1 2
+#define PIN_LED2 3
+
+// Motor Pins
+// #define PIN_Stepper0 6
+// #define PIN_Stepper1 8
+
+
 // setup for having multiple tasks
 TaskHandle_t timeTaskHandler = NULL;
 TaskHandle_t timeWatcherTaskHandler = NULL;
 BaseType_t xTaskWokenByReceive = pdFALSE; // default is token is has not been successfully recieved from xQueueRecieveFromISR
 BaseType_t xTaskWokenByReceive2 = pdFALSE;
 using std::vector;
-
+vector<Driver> drivers(2);
 vector<LED> leds(3); // leds hold the LED structs
 Timer timeoutClock; // Timer that will countdown to ending the currently used devices
 BaseType_t  xHigherPriorityTaskWoken = pdFALSE;
 
 
-//BLE setup
+// BLE setup
 BLEServer* pServer = nullptr;
 BLECharacteristic* pCharacteristic = nullptr;
 bool deviceConnected = false;
@@ -55,7 +66,7 @@ class MyServerCallbacks : public BLEServerCallbacks {
         BLEDevice::startAdvertising();
     }
 };
-//
+
 
 // Function to process commands received via BLE
 void processCommand(String command) {
@@ -101,7 +112,14 @@ void processCommand(String command) {
 
         Serial.println(currentTime);
         sendConfirmation("Time: " + String(currentTime));
+    } else if (command.startsWith("speed")) {
+        // int led = command.substring(6).toInt();
+        // blink(getLedPin(led));
+      
+      drivers.at(0).createStepper(2,1,5,13);
+
     } 
+   
     else {
         sendConfirmation("Invalid command received");
     }
@@ -113,7 +131,8 @@ void processCommand(String command) {
 // Callback to process received BLE messages
 class MyCallbacks : public BLECharacteristicCallbacks {
     void onWrite(BLECharacteristic* pCharacteristic) {
-        String value = pCharacteristic->getValue();
+     
+        std::string value = pCharacteristic->getValue();
         if (value.length() > 0) {
             Serial.print("Received message: ");
             Serial.println(value.c_str());
@@ -152,7 +171,7 @@ void timeWatcher(void * params){
   }
 }
 
-
+ Driver driver;
 void setup() {
     Serial.begin(115200);
     esp_task_wdt_deinit();
@@ -162,16 +181,26 @@ void setup() {
     // Initialize LEDs
 
     // leds = {};//(LED*)calloc(sizeof(LED),3); // assigning memory to each LED struct
-    #ifndef TESTING
-    Serial.println("Starting BLE Server...");
-    leds.at(0).pin = PIN_LED0;
-    leds.at(1).pin = PIN_LED1;
-    leds.at(2).pin = PIN_LED2;
-    pinMode(leds.at(0).pin, OUTPUT);
-    pinMode(leds.at(1).pin, OUTPUT);
-    pinMode(leds.at(2).pin, OUTPUT);
+    // #ifndef TESTING
+    // Serial.println("Starting BLE Server...");
+    // leds.at(0).pin = PIN_LED0;
+    // leds.at(1).pin = PIN_LED1;
+    // leds.at(2).pin = PIN_LED2;
+    // pinMode(leds.at(0).pin, OUTPUT);
+    // pinMode(leds.at(1).pin, OUTPUT);
+    // pinMode(leds.at(2).pin, OUTPUT);
 
-
+    
+    // drivers.at(0).createStepper(9,5,6,13);
+    // drivers.at(0).createStepper(9,5,6,13);
+    // drivers.at(0).setSpeed(10);
+    // createStepper(int enable,int dir, int step, int last){
+   driver.createStepper(7,8,9,13);
+    driver.setSpeed(50);
+    // LED led1;
+    // led.pin =2;
+    // led.changeBrightness(50);
+    // #ifndef 
     // Initialize BLE
     BLEDevice::init("ESP32_BLE_Server");
     pServer = BLEDevice::createServer();
@@ -200,7 +229,7 @@ void setup() {
     pServer->getAdvertising()->start();
 
     Serial.println("BLE Server Started. Waiting for connections...");
-    #endif
+    // #endif
     /*
       XtaskCreatePinnedToCore will create a separate task that will run along with the main program
       and assign it to a given core.
@@ -259,7 +288,9 @@ void sendConfirmation(String message) {
 void loop() {
     // Testing space
    
-
+//  drivers.at(0).setStep(4);
+Serial.println("hello");
+driver.setStep(3);
     #ifdef TESTING
       TestRunner::run();
     #endif
