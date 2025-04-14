@@ -10,6 +10,9 @@
 #define SECOND 1000
 #define TIMEOUTCLOCK 60*30 
 // Time
+unsigned long timerDuration = 60; // Default to 60 seconds
+QueueHandle_t durationQueue; // Queue to pass duration from BLE to the timer task
+
 QueueHandle_t timeQueue; // for the two tasks
 QueueHandle_t timeRequestQueue; // for time watcher and BLE
 
@@ -58,6 +61,7 @@ struct Timer {
       xQueueSendFromISR(timeQueue, &time, &xHigherPriorityTaskWoken );
       // xQueueSend(timeQueue, &time, portMAX_DELAY); // sends the time to the task queue so that another task can report the time.
       wait((unsigned long) SECOND);
+      Serial.print("test"+ i);
       time = i;
     }
     timing =0;

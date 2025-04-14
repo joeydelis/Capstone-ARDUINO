@@ -123,6 +123,26 @@ public:
     this->speed = 0;
     this->motorDriver->step(this->speed);
   }
+
+/*
+  moveUp
+  moves the stepper Motor up with a speed of 1;
+  this is to be used incrementally
+*/
+  void moveUp(){
+
+    this->motorDriver->setSpeed(1);
+    this->motorDriver->setSpeed(0);
+  }
+  /*
+  moveDown
+  moves the stepper Motor down with a speed of 1;
+  this is to be used incrementally
+*/
+  void moveDown(){
+    this->motorDriver->setSpeed(1);
+     this->motorDriver->setSpeed(0);
+  }
 };
 /*
   FlexyDriver is an alternative Driver controling solution that speaks to the motor in the matter of 
