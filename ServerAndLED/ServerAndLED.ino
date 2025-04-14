@@ -26,7 +26,7 @@
 Stepper stepper1(STEPS_PER_REV, DIR_PIN_1, STEP_PIN_1);
 Stepper stepper2(STEPS_PER_REV, DIR_PIN_2, STEP_PIN_2);
 
-// Predefined pins that are used with the test esp32 device
+// Predefined pins that are used with the test esp32 device`
 #define PIN_LED0 27
 #define PIN_LED1 26
 #define PIN_LED2 25
@@ -113,10 +113,12 @@ void processCommand(String command) {
     }  
     else if (command.equals("UP")) {
         moveStepper(200); // Move up (adjust steps as needed)
+        leds.at(1).blink();
         sendConfirmation("Stepper moved UP");
     } 
     else if (command.equals("DOWN")) {
         moveStepper(-200); // Move down
+        leds.at(2).blink();
         sendConfirmation("Stepper moved DOWN");
     } 
     else if (command.startsWith("TIMER_")) {
@@ -330,13 +332,34 @@ void loop() {
   This starts as soon as the system starts
 */
 void startTimer(void *params) {
-    unsigned long receivedDuration = timerDuration; // Default value
+    unsigned long receivedDuration = 0;
+
     while (1) {
         if (xQueueReceive(durationQueue, &receivedDuration, portMAX_DELAY) == pdPASS) {
-            timeoutClock.stopwatch(receivedDuration); // Run timer for received duration
+            timeoutClock.stopwatch(receivedDuration); // Start the visual/logical timer
+
+            vTaskDelay(pdMS_TO_TICKS(receivedDuration * 1000)); // Wait for the duration
+
+            // Timer expired: stop all other actions
+            Serial.println("Timer expired. Stopping all actions...");
+
+            // Stop LED
+             leds.at(0).light(0);
+             leds.at(1).light(0);
+             leds.at(2).light(0);
+
+
+
+            // You can also notify the app if needed
+           // pCharacteristic->setValue("TIMER_COMPLETE");
+            //pCharacteristic->notify();
+
+            // Optional: Set a flag to block new actions unless reset
+            // isDeviceTimedOut = true;
         }
     }
 }
+
 /*
   Watches the value of from the timer
 */
@@ -451,5 +474,4 @@ void sendConfirmation(String message) {
         Serial.println("Sent: " + message);
     }
 }
-
 
