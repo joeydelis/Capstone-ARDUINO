@@ -1,13 +1,19 @@
 #include "aunit/TestRunner.h"
 #include "aunit/AssertMacros.h"
-#include "NonBLETestsNano.h"
-#include "NonBLETestsPhysical.h"
-#include "NonBLETestsWokwi.h"
 using namespace aunit;
 
 
+/*
+  These tests will the functions created in Device.h. 
+  Timer.h wait function will be tested.
 
+  testing using Wokwi will be done to test motor functionaliy
+  Manual testing will be done to test bluetooth functionality
+*/
 
+/*
+  Setup for testing the testcases for each esp32 board will look like this class
+*/
 class NonBLETestsDOIT: public TestOnce {
    protected:
     std::vector<LED> leds;
@@ -31,8 +37,7 @@ class NonBLETestsDOIT: public TestOnce {
     pinMode(leds.at(1).pin, OUTPUT);
     pinMode(leds.at(2).pin, OUTPUT);
 
-  // stepperMotor;
-  // stepperMotor.createStepper(4,9,10,5);
+
     
 
   }
@@ -119,29 +124,6 @@ testF(NonBLETestsDOIT, waitTest5){
 }
 //Motor tests
 
-// TestF(NonBLETestsDOIT, MotorClockwiseTest){
-//   int rpm =5;
-//   stepperMotor.setSpeed(rpm);
-//   stepperMotor.setStep(rpm);
-//   Serial.println("Is the motor spinning clockwise? 1 = yes 0 = no ")
-//   while(Serial.available()){
-
-//   }
-//   int confrm = (int) Serial.parseInt();
-//   assertEqual(confirm, 1)
-// }
-// TestF(NonBLETestsDOIT, MotorCounterClockwiseTest){
-//   int rpm =5;
-//   stepperMotor.setSpeed(rpm);
-//   stepperMotor.setStep(-rpm);
-//   Serial.println("Is the motor spinning counter clockwise? 1 = yes 0 = no ")
-//   while(Serial.available()){
-
-//   }
-//   int confrm = (int) Serial.parseInt();
-//   assertEqual(confirm, 1)
-// }
-/*
 
 Wokwi
 
@@ -153,44 +135,17 @@ class NonBLETestsWokwi: public TestOnce {
   void setup() override{
     TestOnce::setup();
     Serial.begin(115200);
-    // Serial.println("Starting BLE Server...");
-    // esp_task_wdt_deinit();
-    // Creating a queue that only holds the current time.
-    // timeQueue = xQueueCreate(1, sizeof(int));
-    // timeRequestQueue = xQueueCreate(1, sizeof(int));
-    // Initialize LEDs
 
-    // leds = {};//(LED*)calloc(sizeof(LED),3); // assigning memory to each LED struct
-    // using std::vector;
     leds.resize(3);
     leds.at(0).pin = 11;
     leds.at(1).pin = 12;
     leds.at(2).pin = 13;
-    // pinMode(leds.at(0).pin, OUTPUT);
-    // pinMode(leds.at(1).pin, OUTPUT);
-    // pinMode(leds.at(2).pin, OUTPUT);
-// Serial.println("Past LED");
+
     stepperMotor;
     stepperMotor.createStepper(0,45,47,48);
-    // stepperMotor.setSpeed(0); 
-    // stepperMotor.setStep(0);
-//     Serial.println("Past motor");
+
 
   }
-    // void teardown() override {
-     
-    //   leds.at(0).light(0);
-    //   leds.at(1).light(0);
-    //   leds.at(2).light(0);
-    // //   stepperMotor.setSpeed(0); 
-    // //   stepperMotor.setStep(0);
-      
-
-    // //   TestOnce::teardown();
-    // }
-   
-    
-
 };
 // LED tests
 testF(NonBLETestsWokwi, LEDOn){
@@ -259,31 +214,6 @@ testF(NonBLETestsWokwi, waitWokwi3){
   wait(timeToWait);
   assertLessOrEqual(millis()-start,(unsigned long) timeToWait);
 }
-// // Motor Tests
-// testF(NonBLETestsWokwi, motorClockwiseMotion){
-//   int rpm = 60;
-//   int step =5;
-//   stepperMotor.setSpeed(rpm);
-//   stepperMotor.setStep(step);
-//   // Wokwi will check that it is moving clockwize
-//   while(Serial.available()){
-//     // waits for wokwi input
-//   }
-//   assertEqual((int) Serial.parseInt(), 1);
-
-// }
-// testF(NonBLETestsWokwi, motorCounterClockwiseMotion){
-//   int rpm = 60;
-//   int step =5;
-//   stepperMotor.setSpeed(rpm);
-//   stepperMotor.setStep(step);
-//   // Wokwi will check that it is moving clockwize
-//   while(Serial.available()){
-//     // waits for wokwi input
-//   }
-//   assertEqual((int) Serial.parseInt(), 1);
-
-// }
 
 
 

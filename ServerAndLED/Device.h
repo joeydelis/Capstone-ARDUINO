@@ -10,7 +10,7 @@
 #define PAUSE 50
 #define ON 150
 #define OFF 0
-using std::string;
+
 // analogWrite is used instead of digital write to tue more control of the power given to the device
 
 const float accelerationLimit = 4;
@@ -127,6 +127,10 @@ public:
 /*
   FlexyDriver is an alternative Driver controling solution that speaks to the motor in the matter of 
   speed, acceleration, and deceleration rather than steps.
+  
+  To make full use of the library the device would need a home switch to track the position.
+  
+  Warning: Since this is not a Arduino made function, FlexyStepper library may not be maintained.
 */
 struct FlexyDriver : Device {
 private:
@@ -200,6 +204,8 @@ public:
   void startMotor(int core) {
     this->motorDriver.startAsService(core);
   }
+
+
 };
 struct LED : Device {
   int pin;

@@ -3,14 +3,19 @@
 #include <BLEUtils.h>
 #include <BLE2902.h>
 #include <vector>
+#include <iostream>
+#include <string.h>
+#include <WString.h>
 #include "sdkconfig.h"
 #include "esp_task_wdt.h"
 #include <queue>
 #include "Timer.h"
 #include "Device.h"
 
-#define SERVICE_UUID "12345678-1234-5678-1234-56789abcdef0"
-#define CHARACTERISTIC_UUID "abcd1234-5678-1234-5678-abcdef123456"
+
+// UUID Generated from https://www.guidgenerator.com/
+#define SERVICE_UUID "c93e8091-1b04-4258-8ac2-2588e890e121"
+#define CHARACTERISTIC_UUID "e7467b73-034c-4f44-8afc-4cac0be2db0b"
 
 
 /*
@@ -27,15 +32,23 @@
 /*
   Build property flags
 
-  To test a specific 
+  To unit test a specific device uncomment TESTING and
+  a esp32 device such as:
+    DOIT for the doit esp32
+    NANO for the arduino nano esp32
+   
+  To build for WOWKI refer to the Unit testing branch for building and running
 */
-// #define PRODUCTION
+
 // #define TESTING
 // #define BLETEST
-// #ifdef TESTING
+// #define DOIT;
+// #define WOKWI
+// #define NANO
+#ifdef TESTING
 #include <AUnit.h>
 #include "tests/AunitTests.cpp"
-// #endif
+#endif
 
 // Predefined pins that are used with the test esp32 device
 
@@ -57,6 +70,8 @@
 
 
 using std::vector;
+using std::string;
+
 
 // setup for having multiple tasks
 TaskHandle_t timeTaskHandler = NULL;
@@ -155,8 +170,10 @@ void processCommand(String command) {
 // Callback to process received BLE messages
 class MyCallbacks : public BLECharacteristicCallbacks {
   void onWrite(BLECharacteristic* pCharacteristic) {
-
-    std::string value = pCharacteristic->getValue();
+    // DOIT esp32
+    // String value = pCharacteristic->getValue();
+    // nano esp32
+   string value = pCharacteristic->getValue();
     if (value.length() > 0) {
       Serial.print("Received message: ");
       Serial.println(value.c_str());
@@ -186,24 +203,34 @@ void startTimer(void* params) {
 void timeWatcher(void* params) {
   while (1) {
     unsigned long currentTime;
-
-
-    xQueueReceiveFromISR(timeQueue, &currentTime, &xTaskWokenByReceive);           // receives time while the stopwatch function is counting.
-    xQueueSendFromISR(timeRequestQueue, &currentTime, &xHigherPriorityTaskWoken);  // Sends time to any time requesting functions
+    // receives time while the stopwatch function is counting.
+    xQueueReceiveFromISR(timeQueue, &currentTime, &xTaskWokenByReceive);         
+    // Sends time to any time requesting functions
+    xQueueSendFromISR(timeRequestQueue, &currentTime, &xHigherPriorityTaskWoken);  
   }
 }
 
 
 void setup() {
   Serial.begin(115200);
+  /*
+    Watchdog task timer is disable becuase by design, the time functions
+    are supposed to take a certain amount of time.
+    This will prevent triggering wdt in for these cases.
+    A yellow light on the esp32 will indicate that wdt is turned off
+  */
   esp_task_wdt_deinit();
   // Creating a queue that only holds the current time.
   timeQueue = xQueueCreate(1, sizeof(int));
   timeRequestQueue = xQueueCreate(1, sizeof(int));
   // Initialize LEDs
 
-  // leds = {};//(LED*)calloc(sizeof(LED),3); // assigning memory to each LED struct
-  // #ifndef TESTING
+  #ifndef TESTING
+
+  /*
+    Commented out due to using multiple esp32s with different pins
+  */
+
   // Serial.println("Starting BLE Server...");
   // leds.at(0).pin = PIN_LED0;
   // leds.at(1).pin = PIN_LED1;
@@ -214,7 +241,7 @@ void setup() {
 
   // Initialize Steppers
 
-  // Stepper library way
+  
   // drivers.at(0).createStepper(9,5,6,13);
   // drivers.at(0).createStepper(9,5,6,13);
   // drivers.at(0).setSpeed(10);
@@ -223,17 +250,20 @@ void setup() {
   // int enable = 6;
   // int extra = 13;
 
+  // 1st Motor Pins
+
   // int step = 9;
   // int dir = 8;
   // int enable = 7;
   // int extra = 13;
 
-  int step = 6;
-  int dir = 9;
-  int enable = 8;
-  int extra = 13;
-  // driver.createStepper(enable, step, dir, extra);
-  // driver.setSpeed(10);
+  //  2nd motor pins
+
+  // int step = 6;
+  // int dir = 9;
+  // int enable = 8;
+  // int extra = 13;
+  #endif
 
 
 #ifndef TESTING
