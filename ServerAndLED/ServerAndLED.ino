@@ -3,15 +3,31 @@
 #include <BLEUtils.h>
 #include <BLE2902.h>
 #include <vector>
-#include "Shared.h"
+#include "sdkconfig.h"
+#include "esp_task_wdt.h"
+#include <queue>
 #include "Timer.h"
 #include "Device.h"
-#include "Governor.h"
+
 #define SERVICE_UUID "12345678-1234-5678-1234-56789abcdef0"
 #define CHARACTERISTIC_UUID "abcd1234-5678-1234-5678-abcdef123456"
 
+
+/*
+  Keep note of the cores that are being used by xTaskCreatePinnedToCore and FlexyDriver (in Device.h)
+  as the esp32 only has two performance cores which if a core is overused, may see a decrease in perfomance.
+
+  governor.h will not be pursued to monitor each device connected because it was planned to actively check 
+  each device which will take resources as it will be constantly running on the core. This would interfere
+  with Stepper motor and timer functions.
+*/
+
+
+
 /*
   Build property flags
+
+  To test a specific 
 */
 // #define PRODUCTION
 // #define TESTING
@@ -22,14 +38,17 @@
 // #endif
 
 // Predefined pins that are used with the test esp32 device
-// #define PIN_LED0 27
-// #define PIN_LED1 26
-// #define PIN_LED2 25
+
+#define PIN_LED0 27
+#define PIN_LED1 26
+#define PIN_LED2 25
+
+
 
 // Nano pins
-#define PIN_LED0 1
-#define PIN_LED1 2
-#define PIN_LED2 3
+// #define PIN_LED0 1
+// #define PIN_LED1 2
+// #define PIN_LED2 3
 
 
 // Motor Pins
@@ -37,14 +56,15 @@
 // #define PIN_Stepper1 8
 
 
+using std::vector;
+
 // setup for having multiple tasks
 TaskHandle_t timeTaskHandler = NULL;
 TaskHandle_t timeWatcherTaskHandler = NULL;
 BaseType_t xTaskWokenByReceive = pdFALSE;  // default is token is has not been successfully recieved from xQueueRecieveFromISR
 BaseType_t xTaskWokenByReceive2 = pdFALSE;
-using std::vector;
-Driver driver;
-FlexyDriver fdriver;
+
+
 vector<Driver> drivers(2);
 vector<LED> leds(3);  // leds hold the LED structs
 Timer timeoutClock;   // Timer that will countdown to ending the currently used devices
@@ -115,12 +135,12 @@ void processCommand(String command) {
   } else if (command.startsWith("speed_")) {
     int speed = command.substring(6).toInt();
 
-    driver.setSpeed(speed);
+    ;
     sendConfirmation("A speed of " + String(speed) + "has been applied");
   } else if (command.startsWith("step_")) {
     int step = command.substring(5).toInt();
 
-    driver.setStep(step);
+  
     sendConfirmation("A step of " + String(step) + "has been applied");
   }
 
@@ -208,24 +228,17 @@ void setup() {
   // int enable = 7;
   // int extra = 13;
 
-    int step = 6;
+  int step = 6;
   int dir = 9;
   int enable = 8;
   int extra = 13;
-  driver.createStepper(enable, step, dir, extra);
-  driver.setSpeed(10);
-
-  // FlexySepper way
-
-  // fdriver.createStepper(step,dir,emergency,extra);
+  // driver.createStepper(enable, step, dir, extra);
+  // driver.setSpeed(10);
 
 
-  // LED led1;
-  // led.pin =2;
-  // led.changeBrightness(50);
-  // #ifndef
+#ifndef TESTING
   // Initialize BLE
-  BLEDevice::init("ESP32_BLE_Server");
+  BLEDevice::init("Migraine Mitigatar V1");
   pServer = BLEDevice::createServer();
   pServer->setCallbacks(new MyServerCallbacks());
 
@@ -248,8 +261,8 @@ void setup() {
   pAdvertising->addServiceUUID(SERVICE_UUID);
   pServer->getAdvertising()->start();
 
-  Serial.println("BLE Server Started. Waiting for connections...");
-  // #endif
+  Serial.println("Migraine Mitigator started. Waiting for connections...");
+#endif
   /*
       XtaskCreatePinnedToCore will create a separate task that will run along with the main program
       and assign it to a given core.
@@ -259,31 +272,33 @@ void setup() {
     "timeWatcher",
     1000,
     NULL,
-    0,
+    0,  // Core priority
     &timeTaskHandler,
-    0);
+    0  // Core it's being run on
+  );
   xTaskCreatePinnedToCore(
     startTimer,
     "startTimer",
     1000,
     NULL,
-    0,
+    0,  // Core priority
     &timeWatcherTaskHandler,
-    0);
-    #ifdef TESTING
-    #ifdef DOIT
-      TestRunner::exclude("*");
-      TestRunner::include("NonBLETestsDOIT", "*");
-    #endif
-    #ifdef WOKWI
-      TestRunner::exclude("*");
-      TestRunner::include("NonBLETestsWokwi", "*");
-    #endif
-    #ifdef NANO
-      TestRunner::exclude("*");
-      TestRunner::include("NonBLETestsNano", "*");
-    #endif
-    #endif
+    0  // Core it's being run on
+  );
+#ifdef TESTING
+#ifdef DOIT
+  TestRunner::exclude("*");
+  TestRunner::include("NonBLETestsDOIT", "*");
+#endif
+#ifdef WOKWI
+  TestRunner::exclude("*");
+  TestRunner::include("NonBLETestsWokwi", "*");
+#endif
+#ifdef NANO
+  TestRunner::exclude("*");
+  TestRunner::include("NonBLETestsNano", "*");
+#endif
+#endif
 }
 // Helper function to get LED pin from index
 int getLedPin(int ledIndex) {
@@ -306,9 +321,8 @@ void sendConfirmation(String message) {
 void loop() {
   // Testing space
 
-  //  drivers.at(0).setStep(4);
-  Serial.println("hello");
-  driver.setStep(3);
+
+
 #ifdef TESTING
   TestRunner::run();
 #endif
