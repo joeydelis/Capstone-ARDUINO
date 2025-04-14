@@ -72,9 +72,9 @@
 
 // Predefined pins that are used with the test esp32 device
 
-// #define PIN_LED0 27
-// #define PIN_LED1 26
-// #define PIN_LED2 25
+#define PIN_LED0 27
+#define PIN_LED1 26
+#define PIN_LED2 25
 
 
 
@@ -178,13 +178,14 @@ void processCommand(String command) {
     Serial.println("Command and Confirmation took " + String(totalTimeBLE) + "ms");
 #endif
   } else if (command.equals("UP")) {
-    
-    drivers.at(0).moveUp();
-    drivers.at(1).moveUp();
+    leds.at(1).blink(); //use this for demo to simulate code telling motors to go up
+    //drivers.at(0).moveUp(); //commented out for demo 
+    //drivers.at(1).moveUp();
    
   } else if (command.equals("DOWN")) {
-    drivers.at(0).moveDown();
-    drivers.at(1).moveDown();
+    leds.at(2).blink(); //use this for demo to simulate code telling motors to go down
+    //drivers.at(0).moveDown(); //commented out for demo 
+    //drivers.at(1).moveDown();
   } else if (command.startsWith("TIMER_")) {
     int duration = command.substring(6).toInt();
     if (duration > 0) {
@@ -368,9 +369,9 @@ void shutdownTimerTask(void* param) {
 class MyCallbacks : public BLECharacteristicCallbacks {
   void onWrite(BLECharacteristic* pCharacteristic) {
     // DOIT esp32
-    // String value = pCharacteristic->getValue();
+      String value = pCharacteristic->getValue();
     // nano esp32
-    string value = pCharacteristic->getValue();
+    //string value = pCharacteristic->getValue();
     if (value.length() > 0) {
       Serial.print("Received message: ");
       Serial.println(value.c_str());
@@ -394,6 +395,9 @@ void startTimer(void* params) {
   while (1) {
     if (xQueueReceive(durationQueue, &receivedDuration, portMAX_DELAY) == pdPASS) {
       timeoutClock.stopwatch(receivedDuration);  // Run timer for received duration
+      leds.at(0).light(0);//turns off lights after timer is up
+      leds.at(1).light(0);
+      leds.at(2).light(0);
     }
   }
 }
@@ -434,13 +438,13 @@ void setup() {
     Commented out due to using multiple esp32s with different pins
   */
 
-// Serial.println("Starting BLE Server...");
-// leds.at(0).pin = PIN_LED0;
-// leds.at(1).pin = PIN_LED1;
-// leds.at(2).pin = PIN_LED2;
-// pinMode(leds.at(0).pin, OUTPUT);
-// pinMode(leds.at(1).pin, OUTPUT);
-// pinMode(leds.at(2).pin, OUTPUT);
+ Serial.println("Starting BLE Server...");
+ leds.at(0).pin = PIN_LED0;
+ leds.at(1).pin = PIN_LED1;
+ leds.at(2).pin = PIN_LED2;
+ pinMode(leds.at(0).pin, OUTPUT);
+ pinMode(leds.at(1).pin, OUTPUT);
+ pinMode(leds.at(2).pin, OUTPUT);
 
 // Initialize Steppers
 
@@ -471,7 +475,7 @@ void setup() {
 
 #ifndef TESTING
   // Initialize BLE
-  BLEDevice::init("Migraine Mitigatar V1");
+  BLEDevice::init("Migraine Mitigator V1");
   pServer = BLEDevice::createServer();
   pServer->setCallbacks(new MyServerCallbacks());
 
