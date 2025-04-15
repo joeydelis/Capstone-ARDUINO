@@ -385,7 +385,12 @@ class MyCallbacks : public BLECharacteristicCallbacks {
 
 /*
   Starts timer task
-  This starts as soon as the system starts
+  This starts as soon as the systevoid saveProfile(String profileName, int led0, int led1, int led2, int brightness, int timerDuration) {
+  preferences.begin("profiles", false);  // Open storage with namespace "profiles"
+
+…  Serial.println("Profile loaded: " + profileName);
+}
+m starts
 */
 
 void startTimer(void* params) {
