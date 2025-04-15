@@ -48,7 +48,7 @@
 
 // #define TESTING
 // #define BLETEST
-// #define DOIT;
+// #define DOIT ;
 // #define WOKWI
 // #define NANO
 #ifdef TESTING
@@ -99,7 +99,7 @@ TaskHandle_t timeWatcherTaskHandler = NULL;
 BaseType_t xTaskWokenByReceive = pdFALSE;  // default is token is has not been successfully recieved from xQueueRecieveFromISR
 BaseType_t xTaskWokenByReceive2 = pdFALSE;
 
-// 
+//
 vector<Driver> drivers(2);
 vector<LED> leds(3);  // leds hold the LED structs
 Timer timeoutClock;   // Timer that will countdown to ending the currently used devices
@@ -178,10 +178,10 @@ void processCommand(String command) {
     Serial.println("Command and Confirmation took " + String(totalTimeBLE) + "ms");
 #endif
   } else if (command.equals("UP")) {
-    
+
     drivers.at(0).moveUp();
     drivers.at(1).moveUp();
-   
+
   } else if (command.equals("DOWN")) {
     drivers.at(0).moveDown();
     drivers.at(1).moveDown();
@@ -313,7 +313,6 @@ void processCommand(String command) {
   } else {
     sendConfirmation("Invalid command received");
   }
-
 }
 
 void saveProfile(String profileName, int led0, int led1, int led2, int brightness, int timerDuration) {
@@ -338,20 +337,20 @@ void loadProfile(String profileName) {
   int brightness = preferences.getInt((profileName + "_brightness").c_str(), 255);
   int timerDuration = preferences.getInt((profileName + "_timer").c_str(), 30);
 
+
   preferences.end();
 
   // Apply the loaded values (simulates loading default pressure values)
-  leds.at(0).light(led0);
-  leds.at(1).light(led1);
-  leds.at(2).light(led2);
-  leds.at(0).changeBrightness(brightness);
-  leds.at(1).changeBrightness(brightness);
-  leds.at(2).changeBrightness(brightness);
+  leds.at(0).changeBrightness(led0);
+  leds.at(1).changeBrightness(led1);
+  leds.at(2).changeBrightness(led2);
+  // leds.at(0).changeBrightness(brightness);
+  // leds.at(1).changeBrightness(brightness);
+  // leds.at(2).changeBrightness(brightness);
   timeoutClock.stopwatch(timerDuration);
 
   Serial.println("Profile loaded: " + profileName);
 }
-
 
 void shutdownTimerTask(void* param) {
   int shutdownTime = *(int*)param;
@@ -386,7 +385,12 @@ class MyCallbacks : public BLECharacteristicCallbacks {
 
 /*
   Starts timer task
-  This starts as soon as the system starts
+  This starts as soon as the systevoid saveProfile(String profileName, int led0, int led1, int led2, int brightness, int timerDuration) {
+  preferences.begin("profiles", false);  // Open storage with namespace "profiles"
+
+…  Serial.println("Profile loaded: " + profileName);
+}
+m starts
 */
 
 void startTimer(void* params) {
@@ -426,7 +430,7 @@ void setup() {
   timeRequestQueue = xQueueCreate(1, sizeof(int));
   // Initialize LEDs
 
-  
+
 
 #ifndef TESTING
 
@@ -496,11 +500,11 @@ void setup() {
 
 
 #endif
-    durationQueue = xQueueCreate(1, sizeof(unsigned long)); // Queue for timer duration
-    Serial.println("Migraine Mitigator started. Waiting for connections...");
-    
+  durationQueue = xQueueCreate(1, sizeof(unsigned long));  // Queue for timer duration
+  Serial.println("Migraine Mitigator started. Waiting for connections...");
 
-    /*
+
+  /*
       XtaskCreatePinnedToCore will create a separate task that will run along with the main program
       and assign it to a given core.
     */

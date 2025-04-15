@@ -279,4 +279,11 @@ struct LED : Device {
       }
     }
   }
+  /*
+  changeBrightnessFast
+  changes the current led brightness to the desired level without incrementing.
+*/
+  void changeBrightnessFast(int level) {
+    analogWrite(pin, power);
+  }
 };

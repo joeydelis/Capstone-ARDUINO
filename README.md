@@ -1,15 +1,18 @@
-# Capstone-ARDUINO
-ARDUINO Code or 5911 Capstone  
+# Migraine Mitigation ESP32 [5911 Capstone]
 
-Upload ServerAndLED code onto an ESP32 ARDUINO which is hooked up to LEDs  
-Then connect to the device via bluetooth.  
-Then send a message such as:  
-"ON_0" → Turns on LED 0  
-"BLINK_1" → Blinks LED 1  
-"BRIGHTNESS_2_180" → Adjusts LED 2 brightness to 180  
+This software is designed to be run on the arduino nano ESP32 s3.
+This software is for helping migraine patient to recieve myofascial release therapy without having to go to the doctor.
+
+This Project is worked along with App development team and the BME team.
+
+## Installation
+
+This project can be built and installed using  Arduino IDE.
 
 
-Unit testing guide
+## Unit Testing Guide
+
+
 
 Requirements:
 Install arduino cli
@@ -54,8 +57,20 @@ wokwi-cli
 to simulate the device.
 
 
-To build for Nano esp32s3 use: (FQBN may have to be changed to arduino:esp32:nano_nora)
+To build for Nano esp32s3 use
 
 rm firmware/* -rf
 
-arduino-cli compile -b esp32:esp32:nano_nora ServerAndLED/ --build-path firmware/ --libraries libraries/ --libraries wokwi_lib --build-property build.extra_flags="-DTESTING -DDOITI"
+arduino-cli compile -b arduino:esp32:nano_nora ServerAndLED/ --build-path firmware/ --libraries libraries/ --libraries wokwi_lib --build-property build.extra_flags="-DTESTING -DDOITI"
+
+
+## Usage/Examples
+
+Upload ServerAndLED code onto an ESP32 ARDUINO which is hooked up to LEDs  
+Then connect to the device via bluetooth.  
+Then send a message such as:  
+"ON_0" → Turns on LED 0  
+"BLINK_1" → Blinks LED 1  
+"BRIGHTNESS_2_180" → Adjusts LED 2 brightness to 180  
+"UP" → To move the motor up
+"DOWN"→ To move the motor down
