@@ -22,7 +22,8 @@
 // UUID Generated from https://www.guidgenerator.com/
 #define SERVICE_UUID "c93e8091-1b04-4258-8ac2-2588e890e121"
 #define CHARACTERISTIC_UUID "e7467b73-034c-4f44-8afc-4cac0be2db0b"
-
+//#define SERVICE_UUID        "12345678-1234-5678-1234-56789abcdef0"
+//#define CHARACTERISTIC_UUID "abcd1234-5678-1234-5678-abcdef123456"
 
 /*
   Keep note of the cores that are being used by xTaskCreatePinnedToCore and FlexyDriver (in Device.h)
@@ -182,7 +183,7 @@ void processCommand(String command) {
     //drivers.at(0).moveUp(); //commented out for demo 
     //drivers.at(1).moveUp();
    
-  } else if (command.equals("DOWN")) {
+   } else if (command.equals("DOWN")) {
     leds.at(2).blink(); //use this for demo to simulate code telling motors to go down
     //drivers.at(0).moveDown(); //commented out for demo 
     //drivers.at(1).moveDown();
